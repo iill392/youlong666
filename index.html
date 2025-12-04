@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游龙平民电竞点单</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            min-height: 100vh;
+            padding-bottom: 70px;
+        }
+        
+        /* 注册/登录弹窗 */
+        .modal {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #FFD700;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .modal-select {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .modal-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: linear-gradient(45deg, #FF512F, #DD2476);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(221, 36, 118, 0.6);
+        }
+        
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: none;
+        }
+        
+        /* 头部 */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-item.active {
+            color: #FFD700;
+        }
+        
+        .nav-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        /* 页面内容 */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* 主页 */
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .order-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .order-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+        
+        .order-desc {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+        }
+        
+        .order-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .order-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        /* 分类页面 */
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .category {
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .category.active {
+            background: rgba(255, 215, 0, 0.3);
+            color: #FFD700;
+        }
+        
+        /* 消息页面 */
+        .contact-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .wechat-id {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #FFD700;
+        }
+        
+        .qr-code {
+            max-width: 200px;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .qr-code img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* 我的页面 */
+        .profile {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-right: 20px;
+            overflow: hidden;
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .user-info p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* 退出登录按钮 */
+        #logoutBtn {
+            width: auto;
+            padding: 8px 15px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .review-status {
+            margin-top: 30px;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .status-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+        
+        .status-desc {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* 下单弹窗 */
+        .order-modal {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+        
+        .order-modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .order-modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #FFD700;
+        }
+        
+        .specs-modal {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .spec-modal {
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .spec-modal:hover {
+            background: rgba(255, 215, 0, 0.3);
+        }
+        
+        .spec-modal.active {
+            background: rgba(255, 215, 0, 0.5);
+            color: #FFD700;
+        }
+        
+        /* 审核弹窗 */
+        .review-modal {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+        
+        .review-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .review-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #FFD700;
+        }
+        
+        .review-message {
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* 后台管理 */
+        .admin-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+        }
+        
+        .admin-btn {
+            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .admin-modal {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+        
+        .admin-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .admin-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #FFD700;
+        }
+        
+        .admin-section {
+            margin-bottom: 30px;
+        }
+        
+        .admin-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #FFD700;
+        }
+        
+        .user-list, .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .user-item, .order-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .approve-btn, .reject-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .approve-btn {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .reject-btn {
+            background: #f44336;
+            color: white;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .orders-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .profile {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 游戏名称输入弹窗 -->
+    <div class="modal" id="gameNameModal">
+        <div class="modal-content">
+            <h2 class="modal-title">输入游戏名称</h2>
+            <input type="text" class="modal-input" id="gameNameInput" placeholder="请输入游戏名称">
+            <button class="modal-btn" id="gameNameConfirmBtn">下一步</button>
+        </div>
+    </div>
+    
+    <!-- 区服选择弹窗 -->
+    <div class="modal" id="serverModal">
+        <div class="modal-content">
+            <h2 class="modal-title">选择区服</h2>
+            <select class="modal-select" id="serverSelect">
+                <option value="">请选择区服</option>
+                <option value="Q区">Q区</option>
+                <option value="V区">V区</option>
+            </select>
+            <button class="modal-btn" id="serverConfirmBtn">进入</button>
+        </div>
+    </div>
+    
+    <!-- 主容器 -->
+    <div class="container" id="mainContainer">
+        <header>
+            <h1>欢迎来到平民电竞点单</h1>
+            <div class="subtitle">全网最性价比的顶尖护</div>
+        </header>
+        
+        <!-- 主页 -->
+        <div class="page active" id="homePage">
+            <h2>热门订单</h2>
+            <div class="orders-grid" id="ordersGrid">
+                <!-- 订单将由JavaScript动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 分类页面 -->
+        <div class="page" id="categoryPage">
+            <h2>分类</h2>
+            <div class="categories">
+                <div class="category active" data-category="all">全部</div>
+                <div class="category" data-category="equipment">装备</div>
+                <div class="category" data-category="skin">皮肤</div>
+                <div class="category" data-category="vip">VIP</div>
+                <div class="category" data-category="other">其他</div>
+            </div>
+            
+            <div class="orders-grid" id="categoryOrdersGrid">
+                <!-- 分类订单将由JavaScript动态生成 -->
+            </div>
+        </div>
+        
+        <!-- 消息页面 -->
+        <div class="page" id="messagePage">
+            <h2>联系客服</h2>
+            <div class="contact-info">
+                <div class="wechat-id">微信号: example123</div>
+                <div class="qr-code">
+                    <!-- 二维码图片，可替换 -->
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMwMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7lm77niYc8L3RleHQ+PHRleHQgeD0iNTAlIiB5PSI1NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzAwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9IjEuM2VtIj5XZWNoYXQgUVLor7fovpPlhaXniYg8L3RleHQ+PC9zdmc+" alt="微信二维码">
+                </div>
+            </div>
+        </div>
+        
+        <!-- 我的页面 -->
+        <div class="page" id="profilePage">
+            <h2>我的信息</h2>
+            <div class="profile">
+                <div class="avatar">
+                    <!-- 随机头像 -->
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iIzMzYzhmZiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTI1IDYwIEEyMCAyMCA0IDAgMSA1NSA2MCBMNTUgNzAgQTIwIDIwIDAgMCAxIDI1IDcwIFoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=" alt="用户头像">
+                </div>
+                <div class="user-info">
+                    <h2 id="userName">用户名</h2>
+                    <p id="userServer">区服: Q区</p>
+                    <button class="modal-btn" id="logoutBtn">退出登录</button>
+                </div>
+            </div>
+            
+            <div class="review-status">
+                <h3>我的订单</h3>
+                <div id="userOrdersList">
+                    <!-- 用户订单将由JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <div class="nav-item active" data-page="homePage">
+                <div class="nav-icon">🏠</div>
+                <div>主页</div>
+            </div>
+            <div class="nav-item" data-page="categoryPage">
+                <div class="nav-icon">📂</div>
+                <div>分类</div>
+            </div>
+            <div class="nav-item" data-page="messagePage">
+                <div class="nav-icon">💬</div>
+                <div>消息</div>
+            </div>
+            <div class="nav-item" data-page="profilePage">
+                <div class="nav-icon">👤</div>
+                <div>我的</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 下单弹窗 -->
+    <div class="order-modal" id="orderModal">
+        <div class="order-modal-content">
+            <h2 class="order-modal-title" id="orderModalTitle">选择规格</h2>
+            <div class="specs-modal" id="specsModal">
+                <!-- 规格将由JavaScript动态生成 -->
+            </div>
+            <button class="modal-btn" id="confirmOrderBtn">确认下单</button>
+            <button class="modal-btn" style="background: #6c757d; margin-top: 10px;" id="cancelOrderBtn">取消</button>
+        </div>
+    </div>
+    
+    <!-- 审核弹窗 -->
+    <div class="review-modal" id="reviewModal">
+        <div class="review-content">
+            <h2 class="review-title" id="reviewTitle">审核通知</h2>
+            <p class="review-message" id="reviewMessage">您的订单正在审核中</p>
+            <button class="modal-btn" id="reviewCloseBtn">确定</button>
+        </div>
+    </div>
+    
+    <!-- 后台管理 -->
+    <div class="admin-panel">
+        <button class="admin-btn" id="adminBtn">管理后台</button>
+    </div>
+    
+    <!-- 后台密码验证 -->
+    <div class="modal" id="adminPasswordModal">
+        <div class="modal-content">
+            <h2 class="modal-title">后台管理</h2>
+            <p style="text-align: center; margin-bottom: 15px;">请输入管理员密码</p>
+            <input type="password" class="modal-input" id="adminPassword" placeholder="请输入密码">
+            <button class="modal-btn" id="adminPasswordBtn">进入</button>
+        </div>
+    </div>
+    
+    <div class="admin-modal" id="adminModal">
+        <div class="admin-content">
+            <h2 class="admin-title">后台管理系统</h2>
+            
+            <div class="admin-section">
+                <h3>用户列表</h3>
+                <div class="user-list" id="userList">
+                    <!-- 用户列表将由JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <div class="admin-section">
+                <h3>订单列表</h3>
+                <div class="order-list" id="adminOrderList">
+                    <!-- 订单列表将由JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <button class="modal-btn" id="adminCloseBtn">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        // 用户数据
+        let currentUser = null;
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        let nextOrderId = orders.length + 1;
+        let currentOrder = null;
+        
+        // 管理员密码
+        const ADMIN_PASSWORD = "admin123";
+        
+        // DOM元素
+        const gameNameModal = document.getElementById('gameNameModal');
+        const gameNameInput = document.getElementById('gameNameInput');
+        const gameNameConfirmBtn = document.getElementById('gameNameConfirmBtn');
+        const serverModal = document.getElementById('serverModal');
+        const serverSelect = document.getElementById('serverSelect');
+        const serverConfirmBtn = document.getElementById('serverConfirmBtn');
+        const mainContainer = document.getElementById('mainContainer');
+        const userNameElement = document.getElementById('userName');
+        const userServerElement = document.getElementById('userServer');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const ordersGrid = document.getElementById('ordersGrid');
+        const categoryOrdersGrid = document.getElementById('categoryOrdersGrid');
+        const categories = document.querySelectorAll('.category');
+        const navItems = document.querySelectorAll('.nav-item');
+        const pages = document.querySelectorAll('.page');
+        const orderModal = document.getElementById('orderModal');
+        const orderModalTitle = document.getElementById('orderModalTitle');
+        const specsModal = document.getElementById('specsModal');
+        const confirmOrderBtn = document.getElementById('confirmOrderBtn');
+        const cancelOrderBtn = document.getElementById('cancelOrderBtn');
+        const reviewModal = document.getElementById('reviewModal');
+        const reviewTitle = document.getElementById('reviewTitle');
+        const reviewMessage = document.getElementById('reviewMessage');
+        const reviewCloseBtn = document.getElementById('reviewCloseBtn');
+        const userOrdersList = document.getElementById('userOrdersList');
+        const adminBtn = document.getElementById('adminBtn');
+        const adminPasswordModal = document.getElementById('adminPasswordModal');
+        const adminPasswordInput = document.getElementById('adminPassword');
+        const adminPasswordBtn = document.getElementById('adminPasswordBtn');
+        const adminModal = document.getElementById('adminModal');
+        const userList = document.getElementById('userList');
+        const adminOrderList = document.getElementById('adminOrderList');
+        const adminCloseBtn = document.getElementById('adminCloseBtn');
+        
+        // 初始化
+        function init() {
+            // 检查是否已登录
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showMainApp();
+            } else {
+                // 只显示游戏名称输入弹窗，不涉及任何后台相关弹窗
+                gameNameModal.style.display = 'flex';
+            }
+            
+            // 生成订单
+            generateOrders();
+            generateCategoryOrders();
+            
+            // 更新用户订单（仅当前用户登录时）
+            if (currentUser) {
+                updateUserOrders();
+            }
+        }
+        
+        // 生成订单数据
+        function generateOrders() {
+            const orderData = getOrderData();
+            
+            ordersGrid.innerHTML = '';
+            
+            orderData.forEach((order, index) => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card';
+                orderCard.innerHTML = `
+                    <div class="order-title">${order.title}</div>
+                    <div class="order-desc">${order.desc}</div>
+                    <button class="order-btn" data-order="${index}">立即下单</button>
+                `;
+                ordersGrid.appendChild(orderCard);
+            });
+            
+            // 添加下单事件
+            document.querySelectorAll('.order-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderIndex = parseInt(this.dataset.order);
+                    showOrderModal(orderIndex);
+                });
+            });
+        }
+        
+        // 生成分类订单
+        function generateCategoryOrders() {
+            const orderData = getOrderData();
+            
+            categoryOrdersGrid.innerHTML = '';
+            
+            // 默认显示全部
+            filterOrdersByCategory('all');
+            
+            // 添加分类点击事件
+            categories.forEach(category => {
+                category.addEventListener('click', function() {
+                    const categoryType = this.dataset.category;
+                    
+                    // 更新分类状态
+                    categories.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 过滤订单
+                    filterOrdersByCategory(categoryType);
+                });
+            });
+        }
+        
+        // 根据分类过滤订单
+        function filterOrdersByCategory(category) {
+            const orderData = getOrderData();
+            categoryOrdersGrid.innerHTML = '';
+            
+            let filteredOrders = orderData;
+            if (category !== 'all') {
+                filteredOrders = orderData.filter(order => order.category === category);
+            }
+            
+            filteredOrders.forEach((order, index) => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card';
+                orderCard.innerHTML = `
+                    <div class="order-title">${order.title}</div>
+                    <div class="order-desc">${order.desc}</div>
+                    <button class="order-btn" data-order="${orderData.indexOf(order)}">立即下单</button>
+                `;
+                categoryOrdersGrid.appendChild(orderCard);
+            });
+            
+            // 添加下单事件
+            document.querySelectorAll('#categoryOrdersGrid .order-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderIndex = parseInt(this.dataset.order);
+                    showOrderModal(orderIndex);
+                });
+            });
+        }
+        
+        // 获取订单数据
+        function getOrderData() {
+            return [
+                { title: "高级装备礼包", desc: "包含多种高级装备，提升战斗力", category: "equipment", 
+                  specs: ["基础版(1件)", "标准版(3件)", "豪华版(5件)"] },
+                { title: "稀有皮肤抽奖", desc: "稀有皮肤，让你的角色更独特", category: "skin", 
+                  specs: ["普通皮肤", "稀有皮肤", "传说皮肤"] },
+                { title: "VIP会员套餐", desc: "VIP特权，享受尊贵体验", category: "vip", 
+                  specs: ["月卡", "季卡", "年卡"] },
+                { title: "游戏币大礼包", desc: "大量游戏币，购买心仪物品", category: "other", 
+                  specs: ["1000币", "5000币", "10000币"] },
+                { title: "限定称号获取", desc: "限定称号，彰显尊贵身份", category: "equipment", 
+                  specs: ["普通称号", "稀有称号", "传说称号"] },
+                { title: "经验加成礼包", desc: "经验加成，快速提升等级", category: "other", 
+                  specs: ["10%加成", "30%加成", "50%加成"] },
+                { title: "技能书礼盒", desc: "多种技能书，学习强大技能", category: "equipment", 
+                  specs: ["初级技能", "中级技能", "高级技能"] },
+                { title: "宠物蛋抽取", desc: "稀有宠物蛋，孵化强力伙伴", category: "other", 
+                  specs: ["普通宠物", "稀有宠物", "传说宠物"] },
+                { title: "坐骑皮肤礼包", desc: "炫酷坐骑皮肤，行走更拉风", category: "skin", 
+                  specs: ["普通皮肤", "稀有皮肤", "传说皮肤"] },
+                { title: "强化石礼盒", desc: "强化装备，提升属性", category: "equipment", 
+                  specs: ["10个", "30个", "50个"] },
+                { title: "宝石礼包", desc: "多种宝石，镶嵌装备增强能力", category: "equipment", 
+                  specs: ["初级宝石", "中级宝石", "高级宝石"] },
+                { title: "时装抽奖", desc: "时尚外观，个性化你的角色", category: "skin", 
+                  specs: ["普通时装", "稀有时装", "传说时装"] },
+                { title: "坐骑进阶材料", desc: "坐骑进阶材料，提升坐骑品质", category: "equipment", 
+                  specs: ["普通材料", "稀有材料", "传说材料"] },
+                { title: "翅膀礼盒", desc: "华丽翅膀，翱翔天际", category: "skin", 
+                  specs: ["普通翅膀", "稀有翅膀", "传说翅膀"] },
+                { title: "神器抽奖", desc: "神器装备，拥有强大力量", category: "equipment", 
+                  specs: ["普通神器", "稀有神器", "传说神器"] },
+                { title: "稀有道具礼包", desc: "稀有道具，助力游戏体验", category: "other", 
+                  specs: ["普通道具", "稀有道具", "传说道具"] },
+                { title: "节日限定礼盒", desc: "节日限定，限时获取", category: "other", 
+                  specs: ["普通礼盒", "稀有礼盒", "传说礼盒"] },
+                { title: "传说装备抽奖", desc: "传说装备，追求极致战力", category: "equipment", 
+                  specs: ["普通装备", "稀有装备", "传说装备"] },
+                { title: "稀有宠物礼包", desc: "稀有宠物，陪伴冒险旅程", category: "other", 
+                  specs: ["普通宠物", "稀有宠物", "传说宠物"] },
+                { title: "高级材料礼盒", desc: "高级材料，制作强力装备", category: "equipment", 
+                  specs: ["普通材料", "稀有材料", "传说材料"] }
+            ];
+        }
+        
+        // 显示下单弹窗
+        function showOrderModal(orderIndex) {
+            const orderData = getOrderData();
+            const order = orderData[orderIndex];
+            
+            currentOrder = order;
+            orderModalTitle.textContent = order.title;
+            
+            // 生成规格选项
+            specsModal.innerHTML = '';
+            order.specs.forEach((spec, index) => {
+                const specElement = document.createElement('div');
+                specElement.className = 'spec-modal';
+                specElement.textContent = spec;
+                specElement.dataset.spec = index;
+                specsModal.appendChild(specElement);
+            });
+            
+            // 添加规格选择事件
+            document.querySelectorAll('.spec-modal').forEach(spec => {
+                spec.addEventListener('click', function() {
+                    document.querySelectorAll('.spec-modal').forEach(s => s.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            orderModal.style.display = 'flex';
+        }
+        
+        // 显示主应用
+        function showMainApp() {
+            gameNameModal.style.display = 'none';
+            serverModal.style.display = 'none';
+            mainContainer.style.display = 'block';
+            
+            // 更新用户信息
+            userNameElement.textContent = currentUser.name;
+            userServerElement.textContent = `区服: ${currentUser.server}`;
+        }
+        
+        // 显示审核消息
+        function showReviewMessage(title, message) {
+            reviewTitle.textContent = title;
+            reviewMessage.textContent = message;
+            reviewModal.style.display = 'flex';
+        }
+        
+        // 更新用户订单
+        function updateUserOrders() {
+            userOrdersList.innerHTML = '';
+            
+            const userOrders = orders.filter(order => order.userId === currentUser.id);
+            
+            if (userOrders.length === 0) {
+                userOrdersList.innerHTML = '<div class="status-card"><div class="status-desc">暂无订单</div></div>';
+                return;
+            }
+            
+            userOrders.forEach(order => {
+                const statusCard = document.createElement('div');
+                statusCard.className = 'status-card';
+                
+                let statusText = '';
+                if (order.status === 'pending') {
+                    statusText = '状态: 正在审核中';
+                } else if (order.status === 'approved') {
+                    statusText = '状态: 审核通过';
+                } else {
+                    statusText = `状态: 审核未通过 - 理由: ${order.reason || '信息不完整'}`;
+                }
+                
+                statusCard.innerHTML = `
+                    <div class="status-title">${order.orderTitle} - ${order.spec}</div>
+                    <div class="status-desc">${statusText}</div>
+                    <div class="status-desc">下单时间: ${order.timestamp}</div>
+                `;
+                userOrdersList.appendChild(statusCard);
+            });
+        }
+        
+        // 更新后台管理界面（只有点击后台按钮时才会调用）
+        function updateAdminPanel() {
+            // 更新用户列表
+            userList.innerHTML = '';
+            users.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.innerHTML = `
+                    <div><strong>${user.name}</strong> - ${user.server}</div>
+                    <div>注册时间: ${user.registerTime}</div>
+                `;
+                userList.appendChild(userItem);
+            });
+            
+            // 更新订单列表
+            adminOrderList.innerHTML = '';
+            orders.forEach(order => {
+                const orderItem = document.createElement('div');
+                orderItem.className = 'order-item';
+                orderItem.innerHTML = `
+                    <div><strong>订单 #${order.id}</strong></div>
+                    <div>用户: ${order.userName} (${order.userServer})</div>
+                    <div>商品: ${order.orderTitle} - ${order.spec}</div>
+                    <div>时间: ${order.timestamp}</div>
+                    <div>状态: ${order.status === 'pending' ? '审核中' : order.status === 'approved' ? '已通过' : '未通过'}</div>
+                    ${order.status === 'pending' ? `
+                        <div class="order-actions">
+                            <button class="approve-btn" data-order="${order.id}">通过</button>
+                            <button class="reject-btn" data-order="${order.id}">拒绝</button>
+                        </div>
+                    ` : ''}
+                `;
+                adminOrderList.appendChild(orderItem);
+            });
+            
+            // 添加审核按钮事件
+            document.querySelectorAll('.approve-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderId = parseInt(this.dataset.order);
+                    const order = orders.find(o => o.id === orderId);
+                    if (order) {
+                        order.status = 'approved';
+                        localStorage.setItem('orders', JSON.stringify(orders));
+                        updateAdminPanel();
+                        
+                        // 更新用户订单显示
+                        if (currentUser && order.userId === currentUser.id) {
+                            updateUserOrders();
+                            showReviewMessage('审核通过', '您的订单已通过审核！');
+                        }
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.reject-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderId = parseInt(this.dataset.order);
+                    const order = orders.find(o => o.id === orderId);
+                    if (order) {
+                        order.status = 'rejected';
+                        order.reason = prompt('请输入拒绝理由:', '信息不符合要求');
+                        localStorage.setItem('orders', JSON.stringify(orders));
+                        updateAdminPanel();
+                        
+                        // 更新用户订单显示
+                        if (currentUser && order.userId === currentUser.id) {
+                            updateUserOrders();
+                            showReviewMessage('审核未通过', `您的订单未通过审核，理由: ${order.reason}`);
+                        }
+                    }
+                });
+            });
+        }
+        
+        // 游戏名称弹窗确认事件
+        gameNameConfirmBtn.addEventListener('click', function() {
+            const name = gameNameInput.value.trim();
+            if (!name) {
+                alert('请输入游戏名称');
+                return;
+            }
+            // 临时存储游戏名称
+            sessionStorage.setItem('tempGameName', name);
+            gameNameModal.style.display = 'none';
+            serverModal.style.display = 'flex';
+        });
+        
+        // 区服弹窗确认事件
+        serverConfirmBtn.addEventListener('click', function() {
+            const server = serverSelect.value;
+            const name = sessionStorage.getItem('tempGameName');
+            if (!server) {
+                alert('请选择区服');
+                return;
+            }
+            // 创建用户
+            const userId = users.length + 1;
+            currentUser = {
+                id: userId,
+                name: name,
+                server: server,
+                registerTime: new Date().toLocaleString()
+            };
+            // 保存用户
+            users.push(currentUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            sessionStorage.removeItem('tempGameName'); // 清除临时存储
+            serverModal.style.display = 'none';
+            showMainApp();
+        });
+        
+        // 退出登录事件
+        logoutBtn.addEventListener('click', function() {
+            // 清除当前用户
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            // 隐藏主界面，显示游戏名称弹窗
+            mainContainer.style.display = 'none';
+            gameNameModal.style.display = 'flex';
+            // 清空输入框
+            gameNameInput.value = '';
+            serverSelect.value = '';
+        });
+        
+        // 导航切换
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const pageId = this.dataset.page;
+                
+                // 更新导航状态
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 显示对应页面
+                pages.forEach(page => page.classList.remove('active'));
+                document.getElementById(pageId).classList.add('active');
+                
+                // 如果是我的页面，更新订单信息
+                if (pageId === 'profilePage' && currentUser) {
+                    updateUserOrders();
+                }
+            });
+        });
+        
+        // 确认下单
+        confirmOrderBtn.addEventListener('click', function() {
+            const selectedSpec = document.querySelector('.spec-modal.active');
+            
+            if (!selectedSpec) {
+                alert('请选择一个规格');
+                return;
+            }
+            
+            // 创建订单
+            const order = {
+                id: nextOrderId++,
+                userId: currentUser.id,
+                userName: currentUser.name,
+                userServer: currentUser.server,
+                orderTitle: currentOrder.title,
+                spec: currentOrder.specs[selectedSpec.dataset.spec],
+                status: 'pending',
+                timestamp: new Date().toLocaleString()
+            };
+            
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            // 关闭下单弹窗
+            orderModal.style.display = 'none';
+            
+            // 显示审核中消息
+            showReviewMessage('审核中', '您的订单已提交，正在审核中...');
+            
+            // 更新用户订单显示
+            updateUserOrders();
+        });
+        
+        // 取消下单
+        cancelOrderBtn.addEventListener('click', function() {
+            orderModal.style.display = 'none';
+        });
+        
+        // 审核弹窗关闭
+        reviewCloseBtn.addEventListener('click', function() {
+            reviewModal.style.display = 'none';
+        });
+        
+        // 后台管理按钮点击事件（只有点击才显示密码弹窗）
+        adminBtn.addEventListener('click', function() {
+            adminPasswordModal.style.display = 'flex';
+        });
+        
+        // 后台密码验证
+        adminPasswordBtn.addEventListener('click', function() {
+            const password = adminPasswordInput.value;
+            
+            if (password === ADMIN_PASSWORD) {
+                adminPasswordModal.style.display = 'none';
+                adminModal.style.display = 'flex';
+                adminPasswordInput.value = '';
+                // 此时才更新后台面板数据
+                updateAdminPanel();
+            } else {
+                alert('密码错误！');
+                adminPasswordInput.value = '';
+            }
+        });
+        
+        adminCloseBtn.addEventListener('click', function() {
+            adminModal.style.display = 'none';
+        });
+        
+        // 初始化应用
+        init();
+    </script>
+</body>
+</html>
