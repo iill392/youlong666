@@ -1,9 +1,14 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>游龙平民电竞点单</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 简化的云存储SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.544.0/dist/umd/lucide.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -523,6 +528,33 @@
             color: white;
         }
         
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #FFD700;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
         /* 响应式设计 */
         @media (max-width: 768px) {
             .orders-grid {
@@ -546,6 +578,11 @@
     </style>
 </head>
 <body>
+    <!-- 加载动画 -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+    </div>
+    
     <!-- 游戏名称输入弹窗 -->
     <div class="modal" id="gameNameModal">
         <div class="modal-content">
@@ -683,7 +720,8 @@
     
     <!-- 后台密码验证 -->
     <div class="modal" id="adminPasswordModal">
-        <div class="modal-content">
+        <div class="modal-content relative">
+            <button class="absolute top-2 right-2 text-white text-2xl" id="adminPasswordCloseBtn">&times;</button>
             <h2 class="modal-title">后台管理</h2>
             <p style="text-align: center; margin-bottom: 15px;">请输入管理员密码</p>
             <input type="password" class="modal-input" id="adminPassword" placeholder="请输入密码">
@@ -714,17 +752,228 @@
     </div>
 
     <script>
+        // GitHub云存储配置
+        const cloudConfig = {
+            storageType: 'github', // 'github', 'localStorage', 或 'customApi'
+            githubToken: '', // “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”
+            githubRepo: '', // “iill392/game-order-system”
+            githubBranch: 'main',
+            apiEndpoint: '' // 
+        };
+
+        // GitHub存储管理器
+        const storageManager = {
+            // GitHub API基础URL
+            apiBase: 'https://api.github.com',
+            
+            // 获取文件内容
+            async getFileContent(path) {
+                try {
+                    const response = await fetch(`${this.apiBase}/repos/${cloudConfig.githubRepo}/contents/${path}`, {
+                        headers: {
+                            'Authorization': `token ${cloudConfig.githubToken}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        return {
+                            content: JSON.parse(atob(data.content)),
+                            sha: data.sha
+                        };
+                    } else if (response.status === 404) {
+                        return null; // 文件不存在
+                    } else {
+                        console.warn('GitHub API错误:', response.status, await response.text());
+                        return null;
+                    }
+                } catch (error) {
+                    console.error('获取GitHub文件失败:', error);
+                    return null;
+                }
+            },
+            
+            // 保存文件内容
+            async saveFileContent(path, content, sha = null) {
+                try {
+                    const body = {
+                        message: `更新${path} - ${new Date().toISOString()}`,
+                        content: btoa(JSON.stringify(content, null, 2)),
+                        branch: cloudConfig.githubBranch
+                    };
+                    
+                    if (sha) {
+                        body.sha = sha;
+                    }
+                    
+                    const response = await fetch(`${this.apiBase}/repos/${cloudConfig.githubRepo}/contents/${path}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${cloudConfig.githubToken}`,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/vnd.github.v3+json'
+                        },
+                        body: JSON.stringify(body)
+                    });
+                    
+                    if (!response.ok) {
+                        console.warn('GitHub保存失败:', response.status, await response.text());
+                        return false;
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    console.error('保存GitHub文件失败:', error);
+                    return false;
+                }
+            },
+            
+            // 保存数据
+            async save(key, data) {
+                try {
+                    if (cloudConfig.storageType === 'github' && cloudConfig.githubToken && cloudConfig.githubRepo) {
+                        const path = `data/${key}.json`;
+                        const existingData = await this.getFileContent(path);
+                        const sha = existingData ? existingData.sha : null;
+                        const success = await this.saveFileContent(path, data, sha);
+                        
+                        if (success) {
+                            console.log(`数据已保存到GitHub: ${key}`);
+                            return true;
+                        } else {
+                            // 如果GitHub失败，回退到localStorage
+                            console.warn('GitHub保存失败，回退到本地存储');
+                            localStorage.setItem(key, JSON.stringify(data));
+                            return true;
+                        }
+                    } else if (cloudConfig.storageType === 'customApi' && cloudConfig.apiEndpoint) {
+                        // 自定义API模式
+                        const response = await fetch(cloudConfig.apiEndpoint + '/save', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ key, data })
+                        });
+                        return response.ok;
+                    } else {
+                        // 本地存储模式
+                        localStorage.setItem(key, JSON.stringify(data));
+                        console.log(`数据已保存到本地: ${key}`);
+                        return true;
+                    }
+                } catch (error) {
+                    console.error('保存数据失败:', error);
+                    // 发生错误时尝试本地存储
+                    try {
+                        localStorage.setItem(key, JSON.stringify(data));
+                        console.log('已回退到本地存储');
+                        return true;
+                    } catch (e) {
+                        return false;
+                    }
+                }
+            },
+
+            // 获取数据
+            async get(key) {
+                try {
+                    if (cloudConfig.storageType === 'github' && cloudConfig.githubToken && cloudConfig.githubRepo) {
+                        const path = `data/${key}.json`;
+                        const data = await this.getFileContent(path);
+                        
+                        if (data) {
+                            console.log(`从GitHub获取数据: ${key}`);
+                            return data.content;
+                        } else {
+                            // 如果GitHub没有数据，尝试从本地获取
+                            const localData = localStorage.getItem(key);
+                            if (localData) {
+                                console.log(`从本地获取数据: ${key}`);
+                                return JSON.parse(localData);
+                            }
+                            return null;
+                        }
+                    } else if (cloudConfig.storageType === 'customApi' && cloudConfig.apiEndpoint) {
+                        const response = await fetch(cloudConfig.apiEndpoint + '/get?key=' + key);
+                        if (response.ok) {
+                            return await response.json();
+                        }
+                        return null;
+                    } else {
+                        // 本地存储模式
+                        const data = localStorage.getItem(key);
+                        return data ? JSON.parse(data) : null;
+                    }
+                } catch (error) {
+                    console.error('获取数据失败:', error);
+                    // 发生错误时尝试本地存储
+                    try {
+                        const localData = localStorage.getItem(key);
+                        if (localData) {
+                            console.log('已回退到本地存储');
+                            return JSON.parse(localData);
+                        }
+                    } catch (e) {
+                        console.error('本地存储读取失败:', e);
+                    }
+                    return null;
+                }
+            },
+
+            // 删除数据
+            async remove(key) {
+                try {
+                    if (cloudConfig.storageType === 'github' && cloudConfig.githubToken && cloudConfig.githubRepo) {
+                        const path = `data/${key}.json`;
+                        const existingData = await this.getFileContent(path);
+                        
+                        if (existingData) {
+                            const response = await fetch(`${this.apiBase}/repos/${cloudConfig.githubRepo}/contents/${path}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Authorization': `token ${cloudConfig.githubToken}`,
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    message: `删除${key} - ${new Date().toISOString()}`,
+                                    sha: existingData.sha,
+                                    branch: cloudConfig.githubBranch
+                                })
+                            });
+                            
+                            if (response.ok) {
+                                console.log(`从GitHub删除数据: ${key}`);
+                                return true;
+                            }
+                        }
+                    } else if (cloudConfig.storageType === 'customApi' && cloudConfig.apiEndpoint) {
+                        const response = await fetch(cloudConfig.apiEndpoint + '/remove?key=' + key, {
+                            method: 'DELETE'
+                        });
+                        return response.ok;
+                    }
+                    
+                    // 同时清除本地存储
+                    localStorage.removeItem(key);
+                    console.log(`从本地删除数据: ${key}`);
+                    return true;
+                } catch (error) {
+                    console.error('删除数据失败:', error);
+                    return false;
+                }
+            }
+        };
+        
         // 用户数据
         let currentUser = null;
-        let users = JSON.parse(localStorage.getItem('users')) || [];
-        let orders = JSON.parse(localStorage.getItem('orders')) || [];
-        let nextOrderId = orders.length + 1;
+        let orders = [];
         let currentOrder = null;
         
         // 管理员密码
         const ADMIN_PASSWORD = "admin123";
         
         // DOM元素
+        const loading = document.getElementById('loading');
         const gameNameModal = document.getElementById('gameNameModal');
         const gameNameInput = document.getElementById('gameNameInput');
         const gameNameConfirmBtn = document.getElementById('gameNameConfirmBtn');
@@ -760,24 +1009,43 @@
         const adminCloseBtn = document.getElementById('adminCloseBtn');
         
         // 初始化
-        function init() {
-            // 检查是否已登录
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showMainApp();
-            } else {
-                // 只显示游戏名称输入弹窗，不涉及任何后台相关弹窗
+        async function init() {
+            try {
+                console.log('开始初始化应用...');
+                
+                // 清除可能的临时数据
+                sessionStorage.removeItem('tempGameName');
+                
+                // 检查是否已登录
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    console.log('发现已登录用户:', currentUser.name);
+                    await showMainApp();
+                } else {
+                    console.log('未发现登录用户，显示登录界面');
+                    // 只显示游戏名称输入弹窗
+                    gameNameModal.style.display = 'flex';
+                }
+                
+                // 生成订单
+                generateOrders();
+                generateCategoryOrders();
+                
+                // 更新用户订单（仅当前用户登录时）
+                if (currentUser) {
+                    await updateUserOrders();
+                    setupOrderNotifications();
+                }
+            } catch (error) {
+                console.error('初始化失败:', error);
+                alert('初始化失败，请刷新页面重试');
+                
+                // 即使初始化失败，也要显示登录界面
                 gameNameModal.style.display = 'flex';
-            }
-            
-            // 生成订单
-            generateOrders();
-            generateCategoryOrders();
-            
-            // 更新用户订单（仅当前用户登录时）
-            if (currentUser) {
-                updateUserOrders();
+            } finally {
+                // 隐藏加载动画
+                loading.style.display = 'none';
             }
         }
         
@@ -937,7 +1205,8 @@
         }
         
         // 显示主应用
-        function showMainApp() {
+        async function showMainApp() {
+            console.log('显示主应用界面');
             gameNameModal.style.display = 'none';
             serverModal.style.display = 'none';
             mainContainer.style.display = 'block';
@@ -945,6 +1214,11 @@
             // 更新用户信息
             userNameElement.textContent = currentUser.name;
             userServerElement.textContent = `区服: ${currentUser.server}`;
+            
+            // 显示欢迎消息
+            setTimeout(() => {
+                showReviewMessage('欢迎', `欢迎回来，${currentUser.name}！`);
+            }, 1000);
         }
         
         // 显示审核消息
@@ -955,110 +1229,282 @@
         }
         
         // 更新用户订单
-        function updateUserOrders() {
+        async function updateUserOrders() {
+            try {
+                userOrdersList.innerHTML = '<div class="status-card"><div class="status-desc">正在加载订单...</div></div>';
+                
+                // 从云存储获取用户订单
+                const allOrders = await storageManager.get('orders') || [];
+                const userOrders = allOrders.filter(order => order.userId === currentUser.id);
+                
+                userOrdersList.innerHTML = '';
+                
+                if (userOrders.length === 0) {
+                    userOrdersList.innerHTML = '<div class="status-card"><div class="status-desc">暂无订单</div></div>';
+                    return;
+                }
+                
+                // 按时间排序
+                userOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                userOrders.forEach(order => {
+                    const statusCard = document.createElement('div');
+                    statusCard.className = 'status-card';
+                    
+                    let statusText = '';
+                    if (order.status === 'pending') {
+                        statusText = '状态: 正在审核中';
+                    } else if (order.status === 'approved') {
+                        statusText = '状态: 审核通过';
+                    } else {
+                        statusText = `状态: 审核未通过 - 理由: ${order.reason || '信息不完整'}`;
+                    }
+                    
+                    // 格式化时间
+                    const formattedTime = order.timestamp ? new Date(order.timestamp).toLocaleString() : '未知时间';
+                    
+                    statusCard.innerHTML = `
+                        <div class="status-title">${order.orderTitle} - ${order.spec}</div>
+                        <div class="status-desc">${statusText}</div>
+                        <div class="status-desc">下单时间: ${formattedTime}</div>
+                    `;
+                    userOrdersList.appendChild(statusCard);
+                });
+            } catch (error) {
+                console.error('更新用户订单失败:', error);
+                
+                // 显示友好的错误信息
+                userOrdersList.innerHTML = `
+                    <div class="status-card">
+                        <div class="status-desc">加载订单失败: ${error.message}</div>
+                        <button class="modal-btn" style="width: auto; margin-top: 10px;" onclick="loadMockOrders()">查看演示数据</button>
+                    </div>
+                `;
+            }
+        }
+        
+        // 加载模拟订单数据
+        function loadMockOrders() {
+            const mockOrders = [
+                {
+                    id: 'mock-1',
+                    orderTitle: '高级装备礼包',
+                    spec: '标准版(3件)',
+                    status: 'approved',
+                    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000)
+                },
+                {
+                    id: 'mock-2',
+                    orderTitle: '稀有皮肤抽奖',
+                    spec: '稀有皮肤',
+                    status: 'pending',
+                    timestamp: new Date(Date.now() - 30 * 60 * 1000)
+                },
+                {
+                    id: 'mock-3',
+                    orderTitle: 'VIP会员套餐',
+                    spec: '月卡',
+                    status: 'rejected',
+                    reason: '信息不完整，请提供更多详情',
+                    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000)
+                }
+            ];
+            
             userOrdersList.innerHTML = '';
             
-            const userOrders = orders.filter(order => order.userId === currentUser.id);
-            
-            if (userOrders.length === 0) {
-                userOrdersList.innerHTML = '<div class="status-card"><div class="status-desc">暂无订单</div></div>';
-                return;
-            }
-            
-            userOrders.forEach(order => {
+            mockOrders.forEach(order => {
                 const statusCard = document.createElement('div');
                 statusCard.className = 'status-card';
                 
                 let statusText = '';
                 if (order.status === 'pending') {
-                    statusText = '状态: 正在审核中';
+                    statusText = '状态: 正在审核中（演示数据）';
                 } else if (order.status === 'approved') {
-                    statusText = '状态: 审核通过';
+                    statusText = '状态: 审核通过（演示数据）';
                 } else {
-                    statusText = `状态: 审核未通过 - 理由: ${order.reason || '信息不完整'}`;
+                    statusText = `状态: 审核未通过（演示数据） - 理由: ${order.reason || '信息不完整'}`;
                 }
                 
                 statusCard.innerHTML = `
                     <div class="status-title">${order.orderTitle} - ${order.spec}</div>
                     <div class="status-desc">${statusText}</div>
-                    <div class="status-desc">下单时间: ${order.timestamp}</div>
+                    <div class="status-desc">下单时间: ${order.timestamp.toLocaleString()}</div>
                 `;
                 userOrdersList.appendChild(statusCard);
             });
         }
         
-        // 更新后台管理界面（只有点击后台按钮时才会调用）
-        function updateAdminPanel() {
-            // 更新用户列表
-            userList.innerHTML = '';
-            users.forEach(user => {
-                const userItem = document.createElement('div');
-                userItem.className = 'user-item';
-                userItem.innerHTML = `
-                    <div><strong>${user.name}</strong> - ${user.server}</div>
-                    <div>注册时间: ${user.registerTime}</div>
-                `;
-                userList.appendChild(userItem);
-            });
+        // 设置订单通知监听
+        function setupOrderNotifications() {
+            if (!currentUser) return;
             
-            // 更新订单列表
-            adminOrderList.innerHTML = '';
-            orders.forEach(order => {
-                const orderItem = document.createElement('div');
-                orderItem.className = 'order-item';
-                orderItem.innerHTML = `
-                    <div><strong>订单 #${order.id}</strong></div>
-                    <div>用户: ${order.userName} (${order.userServer})</div>
-                    <div>商品: ${order.orderTitle} - ${order.spec}</div>
-                    <div>时间: ${order.timestamp}</div>
-                    <div>状态: ${order.status === 'pending' ? '审核中' : order.status === 'approved' ? '已通过' : '未通过'}</div>
-                    ${order.status === 'pending' ? `
-                        <div class="order-actions">
-                            <button class="approve-btn" data-order="${order.id}">通过</button>
-                            <button class="reject-btn" data-order="${order.id}">拒绝</button>
-                        </div>
-                    ` : ''}
-                `;
-                adminOrderList.appendChild(orderItem);
-            });
-            
-            // 添加审核按钮事件
-            document.querySelectorAll('.approve-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const orderId = parseInt(this.dataset.order);
-                    const order = orders.find(o => o.id === orderId);
-                    if (order) {
-                        order.status = 'approved';
-                        localStorage.setItem('orders', JSON.stringify(orders));
-                        updateAdminPanel();
+            // 使用轮询方式检查订单状态变化
+            const checkOrderStatus = async () => {
+                try {
+                    const allOrders = await storageManager.get('orders') || [];
+                    const userOrders = allOrders.filter(order => order.userId === currentUser.id);
+                    
+                    // 检查是否有新的状态变更
+                    userOrders.forEach(order => {
+                        // 获取本地存储的订单状态
+                        const localOrders = JSON.parse(localStorage.getItem('localOrders') || '{}');
+                        const oldStatus = localOrders[order.id];
                         
-                        // 更新用户订单显示
-                        if (currentUser && order.userId === currentUser.id) {
-                            updateUserOrders();
-                            showReviewMessage('审核通过', '您的订单已通过审核！');
+                        // 如果状态发生变化，显示通知
+                        if (oldStatus && oldStatus !== order.status) {
+                            if (order.status === 'approved') {
+                                showReviewMessage('审核通过', '您的订单已通过审核！');
+                            } else if (order.status === 'rejected') {
+                                showReviewMessage('审核未通过', `您的订单未通过审核，理由: ${order.reason || '信息不符合要求'}`);
+                            }
                         }
-                    }
-                });
-            });
-            
-            document.querySelectorAll('.reject-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const orderId = parseInt(this.dataset.order);
-                    const order = orders.find(o => o.id === orderId);
-                    if (order) {
-                        order.status = 'rejected';
-                        order.reason = prompt('请输入拒绝理由:', '信息不符合要求');
-                        localStorage.setItem('orders', JSON.stringify(orders));
-                        updateAdminPanel();
                         
-                        // 更新用户订单显示
-                        if (currentUser && order.userId === currentUser.id) {
-                            updateUserOrders();
-                            showReviewMessage('审核未通过', `您的订单未通过审核，理由: ${order.reason}`);
-                        }
-                    }
+                        // 更新本地状态
+                        localOrders[order.id] = order.status;
+                        localStorage.setItem('localOrders', JSON.stringify(localOrders));
+                    });
+                } catch (error) {
+                    console.error('检查订单状态失败:', error);
+                }
+            };
+            
+            // 每30秒检查一次
+            setInterval(checkOrderStatus, 30000);
+            
+            // 立即检查一次
+            checkOrderStatus();
+        }
+        
+        // 更新后台管理界面
+        async function updateAdminPanel() {
+            try {
+                // 更新用户列表
+                userList.innerHTML = '';
+                const allUsers = await storageManager.get('users') || [];
+                
+                allUsers.forEach(user => {
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    
+                    // 格式化注册时间
+                    const formattedTime = user.registerTime ? new Date(user.registerTime).toLocaleString() : '未知时间';
+                    
+                    userItem.innerHTML = `
+                        <div><strong>${user.name}</strong> - ${user.server}</div>
+                        <div>注册时间: ${formattedTime}</div>
+                    `;
+                    userList.appendChild(userItem);
                 });
-            });
+                
+                // 更新订单列表
+                adminOrderList.innerHTML = '';
+                const allOrders = await storageManager.get('orders') || [];
+                
+                // 按时间排序
+                allOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                allOrders.forEach(order => {
+                    const orderItem = document.createElement('div');
+                    orderItem.className = 'order-item';
+                    
+                    // 格式化时间
+                    const formattedTime = order.timestamp ? new Date(order.timestamp).toLocaleString() : '未知时间';
+                    
+                    orderItem.innerHTML = `
+                        <div><strong>订单 #${order.id}</strong></div>
+                        <div>用户: ${order.userName} (${order.userServer})</div>
+                        <div>商品: ${order.orderTitle} - ${order.spec}</div>
+                        <div>时间: ${formattedTime}</div>
+                        <div>状态: ${order.status === 'pending' ? '审核中' : order.status === 'approved' ? '已通过' : '未通过'}</div>
+                        ${order.status === 'pending' ? `
+                            <div class="order-actions">
+                                <button class="approve-btn" data-order="${order.id}">通过</button>
+                                <button class="reject-btn" data-order="${order.id}">拒绝</button>
+                            </div>
+                        ` : ''}
+                    `;
+                    adminOrderList.appendChild(orderItem);
+                });
+                
+                // 添加审核按钮事件
+                document.querySelectorAll('.approve-btn').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        const orderId = this.dataset.order;
+                        try {
+                            // 获取所有订单
+                            const allOrders = await storageManager.get('orders') || [];
+                            const orderIndex = allOrders.findIndex(order => order.id === orderId);
+                            
+                            if (orderIndex !== -1) {
+                                // 更新订单状态
+                                allOrders[orderIndex].status = 'approved';
+                                allOrders[orderIndex].updatedAt = new Date().toISOString();
+                                
+                                // 保存更新后的订单列表
+                                await storageManager.save('orders', allOrders);
+                                
+                                // 更新后台面板
+                                updateAdminPanel();
+                                
+                                // 如果当前用户是订单所有者，更新用户订单显示
+                                const order = allOrders[orderIndex];
+                                if (currentUser && order.userId === currentUser.id) {
+                                    updateUserOrders();
+                                    showReviewMessage('审核通过', '您的订单已通过审核！');
+                                }
+                                
+                                alert('审核通过！');
+                            }
+                        } catch (error) {
+                            console.error('审核订单失败:', error);
+                            alert('审核失败，请重试');
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.reject-btn').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        const orderId = this.dataset.order;
+                        const reason = prompt('请输入拒绝理由:', '信息不符合要求');
+                        
+                        if (reason === null) return; // 用户取消操作
+                        
+                        try {
+                            // 获取所有订单
+                            const allOrders = await storageManager.get('orders') || [];
+                            const orderIndex = allOrders.findIndex(order => order.id === orderId);
+                            
+                            if (orderIndex !== -1) {
+                                // 更新订单状态
+                                allOrders[orderIndex].status = 'rejected';
+                                allOrders[orderIndex].reason = reason;
+                                allOrders[orderIndex].updatedAt = new Date().toISOString();
+                                
+                                // 保存更新后的订单列表
+                                await storageManager.save('orders', allOrders);
+                                
+                                // 更新后台面板
+                                updateAdminPanel();
+                                
+                                // 如果当前用户是订单所有者，更新用户订单显示
+                                const order = allOrders[orderIndex];
+                                if (currentUser && order.userId === currentUser.id) {
+                                    updateUserOrders();
+                                    showReviewMessage('审核未通过', `您的订单未通过审核，理由: ${reason}`);
+                                }
+                                
+                                alert('已拒绝订单！');
+                            }
+                        } catch (error) {
+                            console.error('拒绝订单失败:', error);
+                            alert('操作失败，请重试');
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('更新后台面板失败:', error);
+                alert('加载数据失败，请刷新页面重试');
+            }
         }
         
         // 游戏名称弹窗确认事件
@@ -1068,6 +1514,7 @@
                 alert('请输入游戏名称');
                 return;
             }
+            console.log('游戏名称输入:', name);
             // 临时存储游戏名称
             sessionStorage.setItem('tempGameName', name);
             gameNameModal.style.display = 'none';
@@ -1075,41 +1522,77 @@
         });
         
         // 区服弹窗确认事件
-        serverConfirmBtn.addEventListener('click', function() {
+        serverConfirmBtn.addEventListener('click', async function() {
             const server = serverSelect.value;
             const name = sessionStorage.getItem('tempGameName');
+            
+            console.log('区服选择:', server);
+            console.log('游戏名称:', name);
+            
             if (!server) {
                 alert('请选择区服');
                 return;
             }
-            // 创建用户
-            const userId = users.length + 1;
-            currentUser = {
-                id: userId,
-                name: name,
-                server: server,
-                registerTime: new Date().toLocaleString()
-            };
-            // 保存用户
-            users.push(currentUser);
-            localStorage.setItem('users', JSON.stringify(users));
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            sessionStorage.removeItem('tempGameName'); // 清除临时存储
-            serverModal.style.display = 'none';
-            showMainApp();
+            
+            if (!name) {
+                alert('游戏名称丢失，请重新输入');
+                serverModal.style.display = 'none';
+                gameNameModal.style.display = 'flex';
+                return;
+            }
+            
+            try {
+                // 显示加载动画
+                loading.style.display = 'flex';
+                
+                // 创建用户数据
+                const userData = {
+                    id: 'user-' + Date.now(),
+                    name: name,
+                    server: server,
+                    registerTime: new Date().toISOString()
+                };
+                
+                // 保存用户数据到云存储
+                const allUsers = await storageManager.get('users') || [];
+                allUsers.push(userData);
+                await storageManager.save('users', allUsers);
+                
+                // 保存当前用户到本地
+                currentUser = userData;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                sessionStorage.removeItem('tempGameName');
+                
+                serverModal.style.display = 'none';
+                await showMainApp();
+                console.log('用户登录成功');
+            } catch (error) {
+                console.error('创建用户失败:', error);
+                alert('登录失败，请重试');
+            } finally {
+                loading.style.display = 'none';
+            }
         });
         
         // 退出登录事件
-        logoutBtn.addEventListener('click', function() {
-            // 清除当前用户
-            localStorage.removeItem('currentUser');
-            currentUser = null;
-            // 隐藏主界面，显示游戏名称弹窗
-            mainContainer.style.display = 'none';
-            gameNameModal.style.display = 'flex';
-            // 清空输入框
-            gameNameInput.value = '';
-            serverSelect.value = '';
+        logoutBtn.addEventListener('click', async function() {
+            try {
+                // 清除当前用户
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('localOrders');
+                currentUser = null;
+                
+                // 隐藏主界面，显示游戏名称弹窗
+                mainContainer.style.display = 'none';
+                gameNameModal.style.display = 'flex';
+                
+                // 清空输入框
+                gameNameInput.value = '';
+                serverSelect.value = '';
+            } catch (error) {
+                console.error('退出登录失败:', error);
+                alert('退出失败，请重试');
+            }
         });
         
         // 导航切换
@@ -1133,7 +1616,7 @@
         });
         
         // 确认下单
-        confirmOrderBtn.addEventListener('click', function() {
+        confirmOrderBtn.addEventListener('click', async function() {
             const selectedSpec = document.querySelector('.spec-modal.active');
             
             if (!selectedSpec) {
@@ -1141,29 +1624,46 @@
                 return;
             }
             
-            // 创建订单
-            const order = {
-                id: nextOrderId++,
-                userId: currentUser.id,
-                userName: currentUser.name,
-                userServer: currentUser.server,
-                orderTitle: currentOrder.title,
-                spec: currentOrder.specs[selectedSpec.dataset.spec],
-                status: 'pending',
-                timestamp: new Date().toLocaleString()
-            };
-            
-            orders.push(order);
-            localStorage.setItem('orders', JSON.stringify(orders));
-            
-            // 关闭下单弹窗
-            orderModal.style.display = 'none';
-            
-            // 显示审核中消息
-            showReviewMessage('审核中', '您的订单已提交，正在审核中...');
-            
-            // 更新用户订单显示
-            updateUserOrders();
+            try {
+                // 显示加载动画
+                loading.style.display = 'flex';
+                
+                // 创建订单
+                const orderData = {
+                    id: 'order-' + Date.now(),
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    userServer: currentUser.server,
+                    orderTitle: currentOrder.title,
+                    spec: currentOrder.specs[selectedSpec.dataset.spec],
+                    status: 'pending',
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log('正在创建订单...', orderData);
+                
+                // 保存订单到云存储
+                const allOrders = await storageManager.get('orders') || [];
+                allOrders.push(orderData);
+                await storageManager.save('orders', allOrders);
+                
+                console.log('订单创建成功，ID:', orderData.id);
+                
+                // 关闭下单弹窗
+                orderModal.style.display = 'none';
+                
+                // 显示审核中消息
+                showReviewMessage('审核中', '您的订单已提交，正在审核中...');
+                
+                // 更新用户订单显示
+                await updateUserOrders();
+            } catch (error) {
+                console.error('创建订单失败:', error);
+                alert('下单失败: ' + error.message);
+            } finally {
+                // 隐藏加载动画
+                loading.style.display = 'none';
+            }
         });
         
         // 取消下单
@@ -1176,7 +1676,7 @@
             reviewModal.style.display = 'none';
         });
         
-        // 后台管理按钮点击事件（只有点击才显示密码弹窗）
+        // 后台管理按钮点击事件
         adminBtn.addEventListener('click', function() {
             adminPasswordModal.style.display = 'flex';
         });
@@ -1189,7 +1689,7 @@
                 adminPasswordModal.style.display = 'none';
                 adminModal.style.display = 'flex';
                 adminPasswordInput.value = '';
-                // 此时才更新后台面板数据
+                // 更新后台面板数据
                 updateAdminPanel();
             } else {
                 alert('密码错误！');
@@ -1201,8 +1701,22 @@
             adminModal.style.display = 'none';
         });
         
+        // 添加后台密码弹窗关闭按钮事件
+        document.getElementById('adminPasswordCloseBtn').addEventListener('click', function() {
+            adminPasswordModal.style.display = 'none';
+        });
+        
+        // 添加点击模态框背景关闭功能
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        });
+        
         // 初始化应用
         init();
     </script>
-</body>
-</html>
+
+</body></html>
