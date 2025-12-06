@@ -198,6 +198,20 @@
             color: #FFD700;
         }
         
+        .order-price-range {
+            font-size: 1rem;
+            color: #ff6b6b;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .order-original-price {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: line-through;
+            margin-bottom: 5px;
+        }
+        
         .order-desc {
             font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.7);
@@ -247,28 +261,23 @@
         .contact-info {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
-            padding: 20px;
+            padding: 30px;
             margin-top: 20px;
             text-align: center;
         }
         
         .wechat-id {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             margin-bottom: 15px;
             color: #FFD700;
+            font-weight: bold;
         }
         
-        .qr-code {
-            max-width: 200px;
-            margin: 0 auto;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .qr-code img {
-            width: 100%;
-            height: auto;
-            display: block;
+        .contact-notice {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-top: 20px;
         }
         
         /* 我的页面 */
@@ -384,6 +393,9 @@
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .spec-modal:hover {
@@ -393,6 +405,61 @@
         .spec-modal.active {
             background: rgba(255, 215, 0, 0.5);
             color: #FFD700;
+        }
+        
+        .spec-name {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .spec-price {
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        
+        /* 支付弹窗 */
+        .payment-modal {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+        
+        .payment-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .payment-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #FFD700;
+        }
+        
+        .payment-amount {
+            font-size: 1.8rem;
+            margin: 20px 0;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .payment-notice {
+            margin: 20px 0;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
         }
         
         /* 审核弹窗 */
@@ -482,6 +549,37 @@
             color: #FFD700;
         }
         
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .admin-header h2 {
+            margin: 0;
+        }
+        
+        .refresh-btn {
+            padding: 8px 15px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+        
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+        
         .admin-section {
             margin-bottom: 30px;
         }
@@ -551,6 +649,60 @@
             animation: spin 1s ease-in-out infinite;
         }
         
+        .loading-text {
+            margin-top: 15px;
+            text-align: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+        
+        /* 下单加载动画 */
+        .order-loading {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+        }
+        
+        .order-loading-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .order-loading-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #FFD700;
+        }
+        
+        .order-loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #FFD700;
+            margin: 0 auto 20px;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        .order-loading-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
@@ -574,13 +726,35 @@
                 margin-right: 0;
                 margin-bottom: 15px;
             }
+            
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .refresh-btn {
+                align-self: stretch;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 加载动画 -->
+    <!-- 初始化加载动画 -->
     <div class="loading" id="loading">
-        <div class="loading-spinner"></div>
+        <div style="text-align: center;">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">系统初始化中...</div>
+        </div>
+    </div>
+    
+    <!-- 下单加载动画 -->
+    <div class="order-loading" id="orderLoading">
+        <div class="order-loading-content">
+            <div class="order-loading-spinner"></div>
+            <h2 class="order-loading-title">订单提交中</h2>
+            <p class="order-loading-text">正在保存订单数据到服务器，请稍候...</p>
+        </div>
     </div>
     
     <!-- 游戏名称输入弹窗 -->
@@ -598,8 +772,8 @@
             <h2 class="modal-title">选择区服</h2>
             <select class="modal-select" id="serverSelect">
                 <option value="">请选择区服</option>
-                <option value="Q区">Q区</option>
-                <option value="V区">V区</option>
+                <option value="QQ区">QQ区</option>
+                <option value="微信区">微信区</option>
             </select>
             <button class="modal-btn" id="serverConfirmBtn">进入</button>
         </div>
@@ -608,7 +782,7 @@
     <!-- 主容器 -->
     <div class="container" id="mainContainer">
         <header>
-            <h1>欢迎来到平民电竞点单</h1>
+            <h1>欢迎来到游龙平民电竞点单</h1>
             <div class="subtitle">全网最性价比的顶尖护</div>
         </header>
         
@@ -640,10 +814,11 @@
         <div class="page" id="messagePage">
             <h2>联系客服</h2>
             <div class="contact-info">
-                <div class="wechat-id">微信号: example123</div>
-                <div class="qr-code">
-                    <!-- 二维码图片，可替换 -->
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMjAwIDIwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiMwMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7lm77niYc8L3RleHQ+PHRleHQgeD0iNTAlIiB5PSI1NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzAwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9IjEuM2VtIj5XZWNoYXQgUVLor7fovpPlhaXniYg8L3RleHQ+PC9zdmc+" alt="微信二维码">
+                <div class="wechat-id">微信号: youlong6665</div>
+                <div class="contact-notice">
+                    如有任何问题，请添加以上微信号联系客服<br>
+                    工作时间：每天 7:00 - 23:00<br>
+                    我们会在15分钟内回复您
                 </div>
             </div>
         </div>
@@ -704,6 +879,21 @@
         </div>
     </div>
     
+    <!-- 支付弹窗 -->
+    <div class="payment-modal" id="paymentModal">
+        <div class="payment-content">
+            <h2 class="payment-title">请完成支付</h2>
+            <div class="payment-amount" id="paymentAmount">¥0.00</div>
+            <div class="payment-notice">
+                请添加客服微信完成支付<br>
+                微信号【长按复制】: <strong>youlong6665</strong><br>
+                支付金额: <span id="paymentAmountText">¥0.00</span>
+            </div>
+            <button class="modal-btn" id="paymentConfirmBtn" style="margin-top: 20px;">好的</button>
+            <button class="modal-btn" style="background: #6c757d; margin-top: 10px;" id="paymentCloseBtn">取消</button>
+        </div>
+    </div>
+    
     <!-- 审核弹窗 -->
     <div class="review-modal" id="reviewModal">
         <div class="review-content">
@@ -731,7 +921,12 @@
     
     <div class="admin-modal" id="adminModal">
         <div class="admin-content">
-            <h2 class="admin-title">后台管理系统</h2>
+            <div class="admin-header">
+                <h2 class="admin-title">后台管理系统</h2>
+                <button class="refresh-btn" id="adminRefreshBtn">
+                    <i class="fa fa-refresh" style="margin-right: 5px;"></i>刷新数据
+                </button>
+            </div>
             
             <div class="admin-section">
                 <h3>用户列表</h3>
@@ -754,11 +949,11 @@
     <script>
         // GitHub云存储配置
         const cloudConfig = {
-            storageType: 'github', // 'github', 'localStorage', 或 'customApi'
-            githubToken: '', // “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”
-            githubRepo: '', // “iill392/game-order-system”
+            storageType: 'github',
+            githubToken: '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',
+            githubRepo: 'iill392/game-order-system',
             githubBranch: 'main',
-            apiEndpoint: '' // 
+            apiEndpoint: ''
         };
 
         // GitHub存储管理器
@@ -769,21 +964,25 @@
             // 获取文件内容
             async getFileContent(path) {
                 try {
-                    const response = await fetch(`${this.apiBase}/repos/${cloudConfig.githubRepo}/contents/${path}`, {
-                        headers: {
-                            'Authorization': `token ${cloudConfig.githubToken}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
-                    });
+                    const response = await Promise.race([
+                        fetch(`${this.apiBase}/repos/${cloudConfig.githubRepo}/contents/${path}`, {
+                            headers: {
+                                'Authorization': `token ${cloudConfig.githubToken}`,
+                                'Accept': 'application/vnd.github.v3+json',
+                                'X-GitHub-Api-Version': '2022-11-28'
+                            }
+                        }),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('连接超时')), 10000))
+                    ]);
                     
                     if (response.ok) {
                         const data = await response.json();
                         return {
-                            content: JSON.parse(atob(data.content)),
+                            content: JSON.parse(this.base64Decode(data.content)),
                             sha: data.sha
                         };
                     } else if (response.status === 404) {
-                        return null; // 文件不存在
+                        return null;
                     } else {
                         console.warn('GitHub API错误:', response.status, await response.text());
                         return null;
@@ -799,7 +998,7 @@
                 try {
                     const body = {
                         message: `更新${path} - ${new Date().toISOString()}`,
-                        content: btoa(JSON.stringify(content, null, 2)),
+                        content: this.base64Encode(JSON.stringify(content, null, 2)),
                         branch: cloudConfig.githubBranch
                     };
                     
@@ -812,7 +1011,8 @@
                         headers: {
                             'Authorization': `token ${cloudConfig.githubToken}`,
                             'Content-Type': 'application/json',
-                            'Accept': 'application/vnd.github.v3+json'
+                            'Accept': 'application/vnd.github.v3+json',
+                            'X-GitHub-Api-Version': '2022-11-28'
                         },
                         body: JSON.stringify(body)
                     });
@@ -829,6 +1029,66 @@
                 }
             },
             
+            // 安全地编码字符串为base64（支持中文）
+            base64Encode(str) {
+                try {
+                    // 方法1：使用TextEncoder（现代浏览器）
+                    const encoder = new TextEncoder();
+                    const encoded = encoder.encode(str);
+                    let binary = '';
+                    const len = encoded.length;
+                    for (let i = 0; i < len; i++) {
+                        binary += String.fromCharCode(encoded[i]);
+                    }
+                    return btoa(binary);
+                } catch (error) {
+                    console.warn('TextEncoder失败，使用备用方法:', error);
+                    // 方法2：备用方法
+                    try {
+                        // 对特殊字符进行编码
+                        const utf8Bytes = unescape(encodeURIComponent(str));
+                        return btoa(utf8Bytes);
+                    } catch (e) {
+                        console.error('备用编码方法也失败:', e);
+                        // 方法3：最简单的回退方案
+                        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+                            return String.fromCharCode('0x' + p1);
+                        }));
+                    }
+                }
+            },
+            
+            // 安全地解码base64为字符串（支持中文）
+            base64Decode(base64) {
+                try {
+                    // 方法1：使用TextDecoder（现代浏览器）
+                    const binary = atob(base64);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) {
+                        bytes[i] = binary.charCodeAt(i);
+                    }
+                    const decoder = new TextDecoder();
+                    return decoder.decode(bytes);
+                } catch (error) {
+                    console.warn('TextDecoder失败，使用备用方法:', error);
+                    // 方法2：备用方法
+                    try {
+                        const utf8Bytes = atob(base64);
+                        let result = '';
+                        for (let i = 0; i < utf8Bytes.length; i++) {
+                            result += String.fromCharCode(utf8Bytes.charCodeAt(i) & 255);
+                        }
+                        return decodeURIComponent(escape(result));
+                    } catch (e) {
+                        console.error('备用解码方法也失败:', e);
+                        // 方法3：最简单的回退方案
+                        return decodeURIComponent(atob(base64).split('').map(function(c) {
+                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                        }).join(''));
+                    }
+                }
+            },
+            
             // 保存数据
             async save(key, data) {
                 try {
@@ -840,15 +1100,19 @@
                         
                         if (success) {
                             console.log(`数据已保存到GitHub: ${key}`);
+                            // 同时在本地保存一份备份
+                            try {
+                                localStorage.setItem(key, JSON.stringify(data));
+                            } catch (e) {
+                                console.warn('本地备份保存失败:', e);
+                            }
                             return true;
                         } else {
-                            // 如果GitHub失败，回退到localStorage
                             console.warn('GitHub保存失败，回退到本地存储');
                             localStorage.setItem(key, JSON.stringify(data));
                             return true;
                         }
                     } else if (cloudConfig.storageType === 'customApi' && cloudConfig.apiEndpoint) {
-                        // 自定义API模式
                         const response = await fetch(cloudConfig.apiEndpoint + '/save', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -856,19 +1120,18 @@
                         });
                         return response.ok;
                     } else {
-                        // 本地存储模式
                         localStorage.setItem(key, JSON.stringify(data));
                         console.log(`数据已保存到本地: ${key}`);
                         return true;
                     }
                 } catch (error) {
                     console.error('保存数据失败:', error);
-                    // 发生错误时尝试本地存储
                     try {
                         localStorage.setItem(key, JSON.stringify(data));
                         console.log('已回退到本地存储');
                         return true;
                     } catch (e) {
+                        console.error('本地存储也失败:', e);
                         return false;
                     }
                 }
@@ -883,9 +1146,15 @@
                         
                         if (data) {
                             console.log(`从GitHub获取数据: ${key}`);
+                            // 同时在本地保存一份缓存
+                            try {
+                                localStorage.setItem(key, JSON.stringify(data.content));
+                            } catch (e) {
+                                console.warn('本地缓存保存失败:', e);
+                            }
                             return data.content;
                         } else {
-                            // 如果GitHub没有数据，尝试从本地获取
+                            console.log(`GitHub上没有找到数据: ${key}，尝试本地存储`);
                             const localData = localStorage.getItem(key);
                             if (localData) {
                                 console.log(`从本地获取数据: ${key}`);
@@ -900,13 +1169,11 @@
                         }
                         return null;
                     } else {
-                        // 本地存储模式
                         const data = localStorage.getItem(key);
                         return data ? JSON.parse(data) : null;
                     }
                 } catch (error) {
                     console.error('获取数据失败:', error);
-                    // 发生错误时尝试本地存储
                     try {
                         const localData = localStorage.getItem(key);
                         if (localData) {
@@ -943,6 +1210,7 @@
                             
                             if (response.ok) {
                                 console.log(`从GitHub删除数据: ${key}`);
+                                localStorage.removeItem(key);
                                 return true;
                             }
                         }
@@ -953,7 +1221,6 @@
                         return response.ok;
                     }
                     
-                    // 同时清除本地存储
                     localStorage.removeItem(key);
                     console.log(`从本地删除数据: ${key}`);
                     return true;
@@ -968,6 +1235,7 @@
         let currentUser = null;
         let orders = [];
         let currentOrder = null;
+        let selectedSpec = null;
         
         // 管理员密码
         const ADMIN_PASSWORD = "admin123";
@@ -994,6 +1262,10 @@
         const specsModal = document.getElementById('specsModal');
         const confirmOrderBtn = document.getElementById('confirmOrderBtn');
         const cancelOrderBtn = document.getElementById('cancelOrderBtn');
+        const paymentModal = document.getElementById('paymentModal');
+        const paymentAmount = document.getElementById('paymentAmount');
+        const paymentConfirmBtn = document.getElementById('paymentConfirmBtn');
+        const paymentCloseBtn = document.getElementById('paymentCloseBtn');
         const reviewModal = document.getElementById('reviewModal');
         const reviewTitle = document.getElementById('reviewTitle');
         const reviewMessage = document.getElementById('reviewMessage');
@@ -1007,45 +1279,170 @@
         const userList = document.getElementById('userList');
         const adminOrderList = document.getElementById('adminOrderList');
         const adminCloseBtn = document.getElementById('adminCloseBtn');
+        const adminRefreshBtn = document.getElementById('adminRefreshBtn');
+        const orderLoading = document.getElementById('orderLoading');
         
         // 初始化
         async function init() {
             try {
                 console.log('开始初始化应用...');
-                
-                // 清除可能的临时数据
                 sessionStorage.removeItem('tempGameName');
                 
-                // 检查是否已登录
                 const savedUser = localStorage.getItem('currentUser');
                 if (savedUser) {
                     currentUser = JSON.parse(savedUser);
                     console.log('发现已登录用户:', currentUser.name);
-                    await showMainApp();
+                    showMainApp();
                 } else {
                     console.log('未发现登录用户，显示登录界面');
-                    // 只显示游戏名称输入弹窗
                     gameNameModal.style.display = 'flex';
                 }
                 
-                // 生成订单
                 generateOrders();
                 generateCategoryOrders();
                 
-                // 更新用户订单（仅当前用户登录时）
                 if (currentUser) {
-                    await updateUserOrders();
+                    updateUserOrders();
                     setupOrderNotifications();
                 }
             } catch (error) {
                 console.error('初始化失败:', error);
                 alert('初始化失败，请刷新页面重试');
-                
-                // 即使初始化失败，也要显示登录界面
                 gameNameModal.style.display = 'flex';
             } finally {
-                // 隐藏加载动画
                 loading.style.display = 'none';
+            }
+        }
+        
+        // 生成订单数据（包含价格信息）
+        function getOrderData() {
+            return [
+                { 
+                    title: "传世武器转盘", 
+                    desc: "包含多种传世武器，提升战斗力", 
+                    category: "equipment", 
+                    specs: [
+                        { name: "立即下单(需加客服微信抽奖)", price: 1, originalPrice: 15 }
+                    ] 
+                },
+                { 
+                    title: "刮地皮单", 
+                    desc: "冰河禁区基础刮地皮，1元保100万", 
+                    category: "skin", 
+                    specs: [
+                        { name: "一保一【保100万+6包】", price: 1, originalPrice: 12 },
+                        { name: "二保一【保200万+转盘】", price: 5.9, originalPrice: 30 },
+                        { name: "三保一【保300万+转盘*2】", price: 7.9, originalPrice: 80 }
+                    ] 
+                },
+                { 
+                    title: "VIP会员套餐", 
+                    desc: "VIP特权，享受尊贵体验，免费护航2次", 
+                    category: "vip", 
+                    specs: [
+                        { name: "月卡", price: 15, originalPrice: 25 },
+                        { name: "季卡", price: 40, originalPrice: 60 },
+                        { name: "年卡", price: 120, originalPrice: 180 }
+                    ] 
+                },
+                { 
+                    title: "赌金单", 
+                    desc: "出8根金条，送1把传世武器", 
+                    category: "other", 
+                    specs: [
+                        { name: "一保一【保100万+7套】", price: 7.9, originalPrice: 8 },
+                        { name: "二保一【保200万+7套+随机金】", price: 18.9, originalPrice: 30 },
+                        { name: "三保一【保400万+7套+随机金*2+抽奖】", price: 19.9, originalPrice: 50 }
+                    ] 
+                },
+                { 
+                    title: "纯实力护", 
+                    desc: "纯有实力的护航", 
+                    category: "equipment", 
+                    specs: [
+                        { name: "一保一【保100万+7套+随机金】", price: 10, originalPrice: 18 },
+                        { name: "二保一【保300万+7套+随机金+抽奖*2】", price: 19.9, originalPrice: 45 },
+                        { name: "三保一【保400万+7套+随机金+抽奖*3】", price: 26.9, originalPrice: 90 }
+                    ] 
+                },
+                { 
+                    title: "老鼠单", 
+                    desc: "使用老鼠打法护航", 
+                    category: "other", 
+                    specs: [
+                        { name: "一保一【保100万+6套】", price: 3, originalPrice: 12 },
+                        { name: "二保一【保150万+随机金+抽奖】", price: 7.9, originalPrice: 30 },
+                        { name: "三保一【随机金*2+转盘*3】", price: 13.9, originalPrice: 50 }
+                    ] 
+                },
+                { 
+                    title: "主播护", 
+                    desc: "游龙亲自护航", 
+                    category: "equipment", 
+                    specs: [
+                        { name: "保200万【送7套+随机金+祝福语】", price: 16.9, originalPrice: 25 }
+                    ] 
+                },
+                { 
+                    title: "淘汰人机单", 
+                    desc: "1图每淘汰一个人机护航+10万，淘汰真人+30万", 
+                    category: "other", 
+                    specs: [
+                        { name: "保底100万", price: 19.9, originalPrice: 15 },
+                        { name: "保底200万", price: 23.9, originalPrice: 45 },
+                        { name: "保底300万", price: 29.9, originalPrice: 100 }
+                    ] 
+                },
+                { 
+                    title: "赌2金单", 
+                    desc: "一局没有出【2根金条】一直护", 
+                    category: "skin", 
+                    specs: [
+                        { name: "一保一【送7套+金+抽奖】", price: 29.9, originalPrice: 20 },
+                        { name: "二保一【送7套+金+抽奖*2】", price: 49.9, originalPrice: 50 },
+                        { name: "三保一【送7套+金*2+抽奖*5】", price: 59.9, originalPrice: 110 }
+                    ] 
+                },
+                { 
+                    title: "赌橙单", 
+                    desc: "一局没出橙色变卖物一直护", 
+                    category: "equipment", 
+                    specs: [
+                        { name: "一保一【送7套+随机金】", price: 29.9, originalPrice: 12 },
+                        { name: "二保一【送7套+随机金+抽奖*2】", price: 49.9, originalPrice: 30 },
+                        { name: "三保一【送7套+随机金*2+抽奖*5】", price: 59.9, originalPrice: 45 }
+                    ] 
+                }
+            ];
+        }
+        
+        // 计算价格范围
+        function getPriceRange(specs) {
+            if (!specs || specs.length === 0) return "价格待定";
+            
+            const prices = specs.map(spec => spec.price);
+            const minPrice = Math.min(...prices);
+            const maxPrice = Math.max(...prices);
+            
+            if (minPrice === maxPrice) {
+                return `¥${minPrice}`;
+            } else {
+                return `¥${minPrice} - ¥${maxPrice}`;
+            }
+        }
+        
+        // 计算原价范围
+        function getOriginalPriceRange(specs) {
+            if (!specs || specs.length === 0) return "";
+            
+            const originalPrices = specs.map(spec => spec.originalPrice);
+            const minOriginalPrice = Math.min(...originalPrices);
+            const maxOriginalPrice = Math.max(...originalPrices);
+            
+            if (minOriginalPrice === maxOriginalPrice) {
+                return `原价: ¥${minOriginalPrice}`;
+            } else {
+                return `原价: ¥${minOriginalPrice} - ¥${maxOriginalPrice}`;
             }
         }
         
@@ -1056,17 +1453,21 @@
             ordersGrid.innerHTML = '';
             
             orderData.forEach((order, index) => {
+                const priceRange = getPriceRange(order.specs);
+                const originalPriceRange = getOriginalPriceRange(order.specs);
+                
                 const orderCard = document.createElement('div');
                 orderCard.className = 'order-card';
                 orderCard.innerHTML = `
                     <div class="order-title">${order.title}</div>
+                    <div class="order-price-range">${priceRange}</div>
+                    <div class="order-original-price">${originalPriceRange}</div>
                     <div class="order-desc">${order.desc}</div>
                     <button class="order-btn" data-order="${index}">立即下单</button>
                 `;
                 ordersGrid.appendChild(orderCard);
             });
             
-            // 添加下单事件
             document.querySelectorAll('.order-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const orderIndex = parseInt(this.dataset.order);
@@ -1080,20 +1481,13 @@
             const orderData = getOrderData();
             
             categoryOrdersGrid.innerHTML = '';
-            
-            // 默认显示全部
             filterOrdersByCategory('all');
             
-            // 添加分类点击事件
             categories.forEach(category => {
                 category.addEventListener('click', function() {
                     const categoryType = this.dataset.category;
-                    
-                    // 更新分类状态
                     categories.forEach(c => c.classList.remove('active'));
                     this.classList.add('active');
-                    
-                    // 过滤订单
                     filterOrdersByCategory(categoryType);
                 });
             });
@@ -1110,69 +1504,27 @@
             }
             
             filteredOrders.forEach((order, index) => {
+                const priceRange = getPriceRange(order.specs);
+                const originalPriceRange = getOriginalPriceRange(order.specs);
+                
                 const orderCard = document.createElement('div');
                 orderCard.className = 'order-card';
                 orderCard.innerHTML = `
                     <div class="order-title">${order.title}</div>
+                    <div class="order-price-range">${priceRange}</div>
+                    <div class="order-original-price">${originalPriceRange}</div>
                     <div class="order-desc">${order.desc}</div>
                     <button class="order-btn" data-order="${orderData.indexOf(order)}">立即下单</button>
                 `;
                 categoryOrdersGrid.appendChild(orderCard);
             });
             
-            // 添加下单事件
             document.querySelectorAll('#categoryOrdersGrid .order-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const orderIndex = parseInt(this.dataset.order);
                     showOrderModal(orderIndex);
                 });
             });
-        }
-        
-        // 获取订单数据
-        function getOrderData() {
-            return [
-                { title: "高级装备礼包", desc: "包含多种高级装备，提升战斗力", category: "equipment", 
-                  specs: ["基础版(1件)", "标准版(3件)", "豪华版(5件)"] },
-                { title: "稀有皮肤抽奖", desc: "稀有皮肤，让你的角色更独特", category: "skin", 
-                  specs: ["普通皮肤", "稀有皮肤", "传说皮肤"] },
-                { title: "VIP会员套餐", desc: "VIP特权，享受尊贵体验", category: "vip", 
-                  specs: ["月卡", "季卡", "年卡"] },
-                { title: "游戏币大礼包", desc: "大量游戏币，购买心仪物品", category: "other", 
-                  specs: ["1000币", "5000币", "10000币"] },
-                { title: "限定称号获取", desc: "限定称号，彰显尊贵身份", category: "equipment", 
-                  specs: ["普通称号", "稀有称号", "传说称号"] },
-                { title: "经验加成礼包", desc: "经验加成，快速提升等级", category: "other", 
-                  specs: ["10%加成", "30%加成", "50%加成"] },
-                { title: "技能书礼盒", desc: "多种技能书，学习强大技能", category: "equipment", 
-                  specs: ["初级技能", "中级技能", "高级技能"] },
-                { title: "宠物蛋抽取", desc: "稀有宠物蛋，孵化强力伙伴", category: "other", 
-                  specs: ["普通宠物", "稀有宠物", "传说宠物"] },
-                { title: "坐骑皮肤礼包", desc: "炫酷坐骑皮肤，行走更拉风", category: "skin", 
-                  specs: ["普通皮肤", "稀有皮肤", "传说皮肤"] },
-                { title: "强化石礼盒", desc: "强化装备，提升属性", category: "equipment", 
-                  specs: ["10个", "30个", "50个"] },
-                { title: "宝石礼包", desc: "多种宝石，镶嵌装备增强能力", category: "equipment", 
-                  specs: ["初级宝石", "中级宝石", "高级宝石"] },
-                { title: "时装抽奖", desc: "时尚外观，个性化你的角色", category: "skin", 
-                  specs: ["普通时装", "稀有时装", "传说时装"] },
-                { title: "坐骑进阶材料", desc: "坐骑进阶材料，提升坐骑品质", category: "equipment", 
-                  specs: ["普通材料", "稀有材料", "传说材料"] },
-                { title: "翅膀礼盒", desc: "华丽翅膀，翱翔天际", category: "skin", 
-                  specs: ["普通翅膀", "稀有翅膀", "传说翅膀"] },
-                { title: "神器抽奖", desc: "神器装备，拥有强大力量", category: "equipment", 
-                  specs: ["普通神器", "稀有神器", "传说神器"] },
-                { title: "稀有道具礼包", desc: "稀有道具，助力游戏体验", category: "other", 
-                  specs: ["普通道具", "稀有道具", "传说道具"] },
-                { title: "节日限定礼盒", desc: "节日限定，限时获取", category: "other", 
-                  specs: ["普通礼盒", "稀有礼盒", "传说礼盒"] },
-                { title: "传说装备抽奖", desc: "传说装备，追求极致战力", category: "equipment", 
-                  specs: ["普通装备", "稀有装备", "传说装备"] },
-                { title: "稀有宠物礼包", desc: "稀有宠物，陪伴冒险旅程", category: "other", 
-                  specs: ["普通宠物", "稀有宠物", "传说宠物"] },
-                { title: "高级材料礼盒", desc: "高级材料，制作强力装备", category: "equipment", 
-                  specs: ["普通材料", "稀有材料", "传说材料"] }
-            ];
         }
         
         // 显示下单弹窗
@@ -1183,21 +1535,24 @@
             currentOrder = order;
             orderModalTitle.textContent = order.title;
             
-            // 生成规格选项
             specsModal.innerHTML = '';
             order.specs.forEach((spec, index) => {
                 const specElement = document.createElement('div');
                 specElement.className = 'spec-modal';
-                specElement.textContent = spec;
                 specElement.dataset.spec = index;
+                specElement.dataset.price = spec.price;
+                specElement.innerHTML = `
+                    <div class="spec-name">${spec.name}</div>
+                    <div class="spec-price">¥${spec.price}</div>
+                `;
                 specsModal.appendChild(specElement);
             });
             
-            // 添加规格选择事件
             document.querySelectorAll('.spec-modal').forEach(spec => {
                 spec.addEventListener('click', function() {
                     document.querySelectorAll('.spec-modal').forEach(s => s.classList.remove('active'));
                     this.classList.add('active');
+                    selectedSpec = parseInt(this.dataset.spec);
                 });
             });
             
@@ -1211,11 +1566,9 @@
             serverModal.style.display = 'none';
             mainContainer.style.display = 'block';
             
-            // 更新用户信息
             userNameElement.textContent = currentUser.name;
             userServerElement.textContent = `区服: ${currentUser.server}`;
             
-            // 显示欢迎消息
             setTimeout(() => {
                 showReviewMessage('欢迎', `欢迎回来，${currentUser.name}！`);
             }, 1000);
@@ -1228,12 +1581,31 @@
             reviewModal.style.display = 'flex';
         }
         
+        // 显示支付弹窗
+        function showPaymentModal(order, spec) {
+            const specData = order.specs[spec];
+            const amount = specData.price;
+            
+            paymentAmount.textContent = `¥${amount}`;
+            document.getElementById('paymentAmountText').textContent = `¥${amount}`;
+            paymentModal.style.display = 'flex';
+        }
+        
+        // 显示订单加载动画
+        function showOrderLoading() {
+            orderLoading.style.display = 'flex';
+        }
+        
+        // 隐藏订单加载动画
+        function hideOrderLoading() {
+            orderLoading.style.display = 'none';
+        }
+        
         // 更新用户订单
         async function updateUserOrders() {
             try {
                 userOrdersList.innerHTML = '<div class="status-card"><div class="status-desc">正在加载订单...</div></div>';
                 
-                // 从云存储获取用户订单
                 const allOrders = await storageManager.get('orders') || [];
                 const userOrders = allOrders.filter(order => order.userId === currentUser.id);
                 
@@ -1244,7 +1616,6 @@
                     return;
                 }
                 
-                // 按时间排序
                 userOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 
                 userOrders.forEach(order => {
@@ -1260,11 +1631,11 @@
                         statusText = `状态: 审核未通过 - 理由: ${order.reason || '信息不完整'}`;
                     }
                     
-                    // 格式化时间
                     const formattedTime = order.timestamp ? new Date(order.timestamp).toLocaleString() : '未知时间';
                     
                     statusCard.innerHTML = `
                         <div class="status-title">${order.orderTitle} - ${order.spec}</div>
+                        <div class="status-desc">订单金额: ¥${order.price}</div>
                         <div class="status-desc">${statusText}</div>
                         <div class="status-desc">下单时间: ${formattedTime}</div>
                     `;
@@ -1272,8 +1643,6 @@
                 });
             } catch (error) {
                 console.error('更新用户订单失败:', error);
-                
-                // 显示友好的错误信息
                 userOrdersList.innerHTML = `
                     <div class="status-card">
                         <div class="status-desc">加载订单失败: ${error.message}</div>
@@ -1290,6 +1659,7 @@
                     id: 'mock-1',
                     orderTitle: '高级装备礼包',
                     spec: '标准版(3件)',
+                    price: 25,
                     status: 'approved',
                     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000)
                 },
@@ -1297,6 +1667,7 @@
                     id: 'mock-2',
                     orderTitle: '稀有皮肤抽奖',
                     spec: '稀有皮肤',
+                    price: 20,
                     status: 'pending',
                     timestamp: new Date(Date.now() - 30 * 60 * 1000)
                 },
@@ -1304,6 +1675,7 @@
                     id: 'mock-3',
                     orderTitle: 'VIP会员套餐',
                     spec: '月卡',
+                    price: 15,
                     status: 'rejected',
                     reason: '信息不完整，请提供更多详情',
                     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000)
@@ -1327,6 +1699,7 @@
                 
                 statusCard.innerHTML = `
                     <div class="status-title">${order.orderTitle} - ${order.spec}</div>
+                    <div class="status-desc">订单金额: ¥${order.price}</div>
                     <div class="status-desc">${statusText}</div>
                     <div class="status-desc">下单时间: ${order.timestamp.toLocaleString()}</div>
                 `;
@@ -1338,19 +1711,15 @@
         function setupOrderNotifications() {
             if (!currentUser) return;
             
-            // 使用轮询方式检查订单状态变化
             const checkOrderStatus = async () => {
                 try {
                     const allOrders = await storageManager.get('orders') || [];
                     const userOrders = allOrders.filter(order => order.userId === currentUser.id);
                     
-                    // 检查是否有新的状态变更
                     userOrders.forEach(order => {
-                        // 获取本地存储的订单状态
                         const localOrders = JSON.parse(localStorage.getItem('localOrders') || '{}');
                         const oldStatus = localOrders[order.id];
                         
-                        // 如果状态发生变化，显示通知
                         if (oldStatus && oldStatus !== order.status) {
                             if (order.status === 'approved') {
                                 showReviewMessage('审核通过', '您的订单已通过审核！');
@@ -1359,7 +1728,6 @@
                             }
                         }
                         
-                        // 更新本地状态
                         localOrders[order.id] = order.status;
                         localStorage.setItem('localOrders', JSON.stringify(localOrders));
                     });
@@ -1368,141 +1736,135 @@
                 }
             };
             
-            // 每30秒检查一次
             setInterval(checkOrderStatus, 30000);
-            
-            // 立即检查一次
             checkOrderStatus();
         }
         
         // 更新后台管理界面
         async function updateAdminPanel() {
             try {
-                // 更新用户列表
-                userList.innerHTML = '';
+                userList.innerHTML = '<div class="user-item">正在加载用户数据...</div>';
+                adminOrderList.innerHTML = '<div class="order-item">正在加载订单数据...</div>';
+                
                 const allUsers = await storageManager.get('users') || [];
                 
-                allUsers.forEach(user => {
-                    const userItem = document.createElement('div');
-                    userItem.className = 'user-item';
-                    
-                    // 格式化注册时间
-                    const formattedTime = user.registerTime ? new Date(user.registerTime).toLocaleString() : '未知时间';
-                    
-                    userItem.innerHTML = `
-                        <div><strong>${user.name}</strong> - ${user.server}</div>
-                        <div>注册时间: ${formattedTime}</div>
-                    `;
-                    userList.appendChild(userItem);
-                });
+                userList.innerHTML = '';
                 
-                // 更新订单列表
+                if (allUsers.length === 0) {
+                    userList.innerHTML = '<div class="user-item">暂无用户数据</div>';
+                } else {
+                    allUsers.forEach(user => {
+                        const userItem = document.createElement('div');
+                        userItem.className = 'user-item';
+                        
+                        const formattedTime = user.registerTime ? new Date(user.registerTime).toLocaleString() : '未知时间';
+                        
+                        userItem.innerHTML = `
+                            <div><strong>${user.name}</strong> - ${user.server}</div>
+                            <div>注册时间: ${formattedTime}</div>
+                        `;
+                        userList.appendChild(userItem);
+                    });
+                }
+                
                 adminOrderList.innerHTML = '';
                 const allOrders = await storageManager.get('orders') || [];
                 
-                // 按时间排序
-                allOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                allOrders.forEach(order => {
-                    const orderItem = document.createElement('div');
-                    orderItem.className = 'order-item';
+                if (allOrders.length === 0) {
+                    adminOrderList.innerHTML = '<div class="order-item">暂无订单数据</div>';
+                } else {
+                    allOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                     
-                    // 格式化时间
-                    const formattedTime = order.timestamp ? new Date(order.timestamp).toLocaleString() : '未知时间';
+                    allOrders.forEach(order => {
+                        const orderItem = document.createElement('div');
+                        orderItem.className = 'order-item';
+                        
+                        const formattedTime = order.timestamp ? new Date(order.timestamp).toLocaleString() : '未知时间';
+                        
+                        orderItem.innerHTML = `
+                            <div><strong>订单 #${order.id}</strong></div>
+                            <div>用户: ${order.userName} (${order.userServer})</div>
+                            <div>商品: ${order.orderTitle} - ${order.spec}</div>
+                            <div>金额: ¥${order.price}</div>
+                            <div>时间: ${formattedTime}</div>
+                            <div>状态: ${order.status === 'pending' ? '审核中' : order.status === 'approved' ? '已通过' : '未通过'}</div>
+                            ${order.status === 'pending' ? `
+                                <div class="order-actions">
+                                    <button class="approve-btn" data-order="${order.id}">通过</button>
+                                    <button class="reject-btn" data-order="${order.id}">拒绝</button>
+                                </div>
+                            ` : ''}
+                        `;
+                        adminOrderList.appendChild(orderItem);
+                    });
                     
-                    orderItem.innerHTML = `
-                        <div><strong>订单 #${order.id}</strong></div>
-                        <div>用户: ${order.userName} (${order.userServer})</div>
-                        <div>商品: ${order.orderTitle} - ${order.spec}</div>
-                        <div>时间: ${formattedTime}</div>
-                        <div>状态: ${order.status === 'pending' ? '审核中' : order.status === 'approved' ? '已通过' : '未通过'}</div>
-                        ${order.status === 'pending' ? `
-                            <div class="order-actions">
-                                <button class="approve-btn" data-order="${order.id}">通过</button>
-                                <button class="reject-btn" data-order="${order.id}">拒绝</button>
-                            </div>
-                        ` : ''}
-                    `;
-                    adminOrderList.appendChild(orderItem);
-                });
-                
-                // 添加审核按钮事件
-                document.querySelectorAll('.approve-btn').forEach(btn => {
-                    btn.addEventListener('click', async function() {
-                        const orderId = this.dataset.order;
-                        try {
-                            // 获取所有订单
-                            const allOrders = await storageManager.get('orders') || [];
-                            const orderIndex = allOrders.findIndex(order => order.id === orderId);
-                            
-                            if (orderIndex !== -1) {
-                                // 更新订单状态
-                                allOrders[orderIndex].status = 'approved';
-                                allOrders[orderIndex].updatedAt = new Date().toISOString();
+                    document.querySelectorAll('.approve-btn').forEach(btn => {
+                        btn.addEventListener('click', async function() {
+                            const orderId = this.dataset.order;
+                            try {
+                                const allOrders = await storageManager.get('orders') || [];
+                                const orderIndex = allOrders.findIndex(order => order.id === orderId);
                                 
-                                // 保存更新后的订单列表
-                                await storageManager.save('orders', allOrders);
-                                
-                                // 更新后台面板
-                                updateAdminPanel();
-                                
-                                // 如果当前用户是订单所有者，更新用户订单显示
-                                const order = allOrders[orderIndex];
-                                if (currentUser && order.userId === currentUser.id) {
-                                    updateUserOrders();
-                                    showReviewMessage('审核通过', '您的订单已通过审核！');
+                                if (orderIndex !== -1) {
+                                    allOrders[orderIndex].status = 'approved';
+                                    allOrders[orderIndex].updatedAt = new Date().toISOString();
+                                    
+                                    await storageManager.save('orders', allOrders);
+                                    updateAdminPanel();
+                                    
+                                    const order = allOrders[orderIndex];
+                                    if (currentUser && order.userId === currentUser.id) {
+                                        updateUserOrders();
+                                        showReviewMessage('审核通过', '您的订单已通过审核！');
+                                    }
+                                    
+                                    alert('审核通过！');
                                 }
-                                
-                                alert('审核通过！');
+                            } catch (error) {
+                                console.error('审核订单失败:', error);
+                                alert('审核失败，请重试');
                             }
-                        } catch (error) {
-                            console.error('审核订单失败:', error);
-                            alert('审核失败，请重试');
-                        }
+                        });
                     });
-                });
-                
-                document.querySelectorAll('.reject-btn').forEach(btn => {
-                    btn.addEventListener('click', async function() {
-                        const orderId = this.dataset.order;
-                        const reason = prompt('请输入拒绝理由:', '信息不符合要求');
-                        
-                        if (reason === null) return; // 用户取消操作
-                        
-                        try {
-                            // 获取所有订单
-                            const allOrders = await storageManager.get('orders') || [];
-                            const orderIndex = allOrders.findIndex(order => order.id === orderId);
+                    
+                    document.querySelectorAll('.reject-btn').forEach(btn => {
+                        btn.addEventListener('click', async function() {
+                            const orderId = this.dataset.order;
+                            const reason = prompt('请输入拒绝理由:', '信息不符合要求');
                             
-                            if (orderIndex !== -1) {
-                                // 更新订单状态
-                                allOrders[orderIndex].status = 'rejected';
-                                allOrders[orderIndex].reason = reason;
-                                allOrders[orderIndex].updatedAt = new Date().toISOString();
+                            if (reason === null) return;
+                            
+                            try {
+                                const allOrders = await storageManager.get('orders') || [];
+                                const orderIndex = allOrders.findIndex(order => order.id === orderId);
                                 
-                                // 保存更新后的订单列表
-                                await storageManager.save('orders', allOrders);
-                                
-                                // 更新后台面板
-                                updateAdminPanel();
-                                
-                                // 如果当前用户是订单所有者，更新用户订单显示
-                                const order = allOrders[orderIndex];
-                                if (currentUser && order.userId === currentUser.id) {
-                                    updateUserOrders();
-                                    showReviewMessage('审核未通过', `您的订单未通过审核，理由: ${reason}`);
+                                if (orderIndex !== -1) {
+                                    allOrders[orderIndex].status = 'rejected';
+                                    allOrders[orderIndex].reason = reason;
+                                    allOrders[orderIndex].updatedAt = new Date().toISOString();
+                                    
+                                    await storageManager.save('orders', allOrders);
+                                    updateAdminPanel();
+                                    
+                                    const order = allOrders[orderIndex];
+                                    if (currentUser && order.userId === currentUser.id) {
+                                        updateUserOrders();
+                                        showReviewMessage('审核未通过', `您的订单未通过审核，理由: ${reason}`);
+                                    }
+                                    
+                                    alert('已拒绝订单！');
                                 }
-                                
-                                alert('已拒绝订单！');
+                            } catch (error) {
+                                console.error('拒绝订单失败:', error);
+                                alert('操作失败，请重试');
                             }
-                        } catch (error) {
-                            console.error('拒绝订单失败:', error);
-                            alert('操作失败，请重试');
-                        }
+                        });
                     });
-                });
+                }
             } catch (error) {
                 console.error('更新后台面板失败:', error);
+                userList.innerHTML = '<div class="user-item">加载用户数据失败</div>';
+                adminOrderList.innerHTML = '<div class="order-item">加载订单数据失败</div>';
                 alert('加载数据失败，请刷新页面重试');
             }
         }
@@ -1515,7 +1877,6 @@
                 return;
             }
             console.log('游戏名称输入:', name);
-            // 临时存储游戏名称
             sessionStorage.setItem('tempGameName', name);
             gameNameModal.style.display = 'none';
             serverModal.style.display = 'flex';
@@ -1542,10 +1903,8 @@
             }
             
             try {
-                // 显示加载动画
                 loading.style.display = 'flex';
                 
-                // 创建用户数据
                 const userData = {
                     id: 'user-' + Date.now(),
                     name: name,
@@ -1553,18 +1912,16 @@
                     registerTime: new Date().toISOString()
                 };
                 
-                // 保存用户数据到云存储
                 const allUsers = await storageManager.get('users') || [];
                 allUsers.push(userData);
                 await storageManager.save('users', allUsers);
                 
-                // 保存当前用户到本地
                 currentUser = userData;
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 sessionStorage.removeItem('tempGameName');
                 
                 serverModal.style.display = 'none';
-                await showMainApp();
+                showMainApp();
                 console.log('用户登录成功');
             } catch (error) {
                 console.error('创建用户失败:', error);
@@ -1577,16 +1934,13 @@
         // 退出登录事件
         logoutBtn.addEventListener('click', async function() {
             try {
-                // 清除当前用户
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('localOrders');
                 currentUser = null;
                 
-                // 隐藏主界面，显示游戏名称弹窗
                 mainContainer.style.display = 'none';
                 gameNameModal.style.display = 'flex';
                 
-                // 清空输入框
                 gameNameInput.value = '';
                 serverSelect.value = '';
             } catch (error) {
@@ -1600,15 +1954,12 @@
             item.addEventListener('click', function() {
                 const pageId = this.dataset.page;
                 
-                // 更新导航状态
                 navItems.forEach(nav => nav.classList.remove('active'));
                 this.classList.add('active');
                 
-                // 显示对应页面
                 pages.forEach(page => page.classList.remove('active'));
                 document.getElementById(pageId).classList.add('active');
                 
-                // 如果是我的页面，更新订单信息
                 if (pageId === 'profilePage' && currentUser) {
                     updateUserOrders();
                 }
@@ -1617,58 +1968,82 @@
         
         // 确认下单
         confirmOrderBtn.addEventListener('click', async function() {
-            const selectedSpec = document.querySelector('.spec-modal.active');
+            const selectedSpecElement = document.querySelector('.spec-modal.active');
             
-            if (!selectedSpec) {
+            if (!selectedSpecElement) {
                 alert('请选择一个规格');
                 return;
             }
             
             try {
-                // 显示加载动画
-                loading.style.display = 'flex';
+                const specData = currentOrder.specs[selectedSpec];
                 
-                // 创建订单
+                // 显示加载动画
+                showOrderLoading();
+                
+                // 保存订单数据到服务器
                 const orderData = {
                     id: 'order-' + Date.now(),
                     userId: currentUser.id,
                     userName: currentUser.name,
                     userServer: currentUser.server,
                     orderTitle: currentOrder.title,
-                    spec: currentOrder.specs[selectedSpec.dataset.spec],
+                    spec: specData.name,
+                    price: specData.price,
+                    originalPrice: specData.originalPrice,
                     status: 'pending',
                     timestamp: new Date().toISOString()
                 };
                 
                 console.log('正在创建订单...', orderData);
                 
-                // 保存订单到云存储
+                // 模拟网络延迟，展示加载效果
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
                 const allOrders = await storageManager.get('orders') || [];
                 allOrders.push(orderData);
-                await storageManager.save('orders', allOrders);
+                const saveResult = await storageManager.save('orders', allOrders);
+                
+                if (!saveResult) {
+                    throw new Error('保存订单到服务器失败');
+                }
                 
                 console.log('订单创建成功，ID:', orderData.id);
                 
-                // 关闭下单弹窗
+                // 关闭加载动画
+                hideOrderLoading();
+                
+                // 关闭下单弹窗，显示支付弹窗
                 orderModal.style.display = 'none';
+                showPaymentModal(currentOrder, selectedSpec);
                 
-                // 显示审核中消息
-                showReviewMessage('审核中', '您的订单已提交，正在审核中...');
-                
-                // 更新用户订单显示
+                // 更新用户订单列表
                 await updateUserOrders();
             } catch (error) {
                 console.error('创建订单失败:', error);
+                // 关闭加载动画
+                hideOrderLoading();
                 alert('下单失败: ' + error.message);
-            } finally {
-                // 隐藏加载动画
-                loading.style.display = 'none';
             }
         });
         
         // 取消下单
         cancelOrderBtn.addEventListener('click', function() {
             orderModal.style.display = 'none';
+            selectedSpec = null;
+        });
+        
+        // 支付确认
+        paymentConfirmBtn.addEventListener('click', function() {
+            paymentModal.style.display = 'none';
+            showReviewMessage('支付成功', '您的订单支付成功，正在等待审核！');
+            selectedSpec = null;
+        });
+        
+        // 支付取消
+        paymentCloseBtn.addEventListener('click', function() {
+            paymentModal.style.display = 'none';
+            selectedSpec = null;
         });
         
         // 审核弹窗关闭
@@ -1689,11 +2064,35 @@
                 adminPasswordModal.style.display = 'none';
                 adminModal.style.display = 'flex';
                 adminPasswordInput.value = '';
-                // 更新后台面板数据
                 updateAdminPanel();
             } else {
                 alert('密码错误！');
                 adminPasswordInput.value = '';
+            }
+        });
+        
+        // 后台刷新按钮点击事件
+        adminRefreshBtn.addEventListener('click', async function() {
+            // 添加点击反馈
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fa fa-refresh fa-spin" style="margin-right: 5px;"></i>刷新中...';
+            this.disabled = true;
+            
+            try {
+                await updateAdminPanel();
+                // 短暂显示成功提示
+                const originalBackground = this.style.background;
+                this.style.background = '#4CAF50';
+                setTimeout(() => {
+                    this.style.background = originalBackground;
+                }, 300);
+            } catch (error) {
+                console.error('刷新后台数据失败:', error);
+            } finally {
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                }, 500);
             }
         });
         
