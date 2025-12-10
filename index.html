@@ -1,2121 +1,847 @@
 <html lang="zh-CN"><head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>游龙平民电竞点单</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>游龙平民电竞俱乐部</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <!-- 简化的云存储SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/lucide@0.544.0/dist/umd/lucide.min.js"></script>
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-            color: white;
-            min-height: 100vh;
-            padding-bottom: 70px;
-        }
-        
-        /* 注册/登录弹窗 */
-        .modal {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-        }
-        
-        .modal-content {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .modal-title {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #FFD700;
-        }
-        
-        .modal-input {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-        }
-        
-        .modal-select {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1rem;
-        }
-        
-        .modal-btn {
-            width: 100%;
-            padding: 15px;
-            margin-top: 20px;
-            background: linear-gradient(45deg, #FF512F, #DD2476);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .modal-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(221, 36, 118, 0.6);
-        }
-        
-        /* 主容器 */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            display: none;
-        }
-        
-        /* 头部 */
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-top: 20px;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #ff8a00, #da1b60);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 20px;
-        }
-        
-        /* 底部导航 */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 100;
-        }
-        
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .nav-item.active {
-            color: #FFD700;
-        }
-        
-        .nav-icon {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-        
-        /* 页面内容 */
-        .page {
-            display: none;
-        }
-        
-        .page.active {
-            display: block;
-        }
-        
-        /* 主页 */
-        .orders-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .order-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s;
-        }
-        
-        .order-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-        
-        .order-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #FFD700;
-        }
-        
-        .order-price-range {
-            font-size: 1rem;
-            color: #ff6b6b;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        .order-original-price {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.6);
-            text-decoration: line-through;
-            margin-bottom: 5px;
-        }
-        
-        .order-desc {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 15px;
-        }
-        
-        .order-btn {
-            width: 100%;
-            padding: 10px;
-            background: linear-gradient(45deg, #2196F3, #21CBF3);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .order-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
-        }
-        
-        /* 分类页面 */
-        .categories {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .category {
-            padding: 15px 25px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .category.active {
-            background: rgba(255, 215, 0, 0.3);
-            color: #FFD700;
-        }
-        
-        /* 消息页面 */
-        .contact-info {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 30px;
-            margin-top: 20px;
-            text-align: center;
-        }
-        
-        .wechat-id {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: #FFD700;
-            font-weight: bold;
-        }
-        
-        .contact-notice {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1rem;
-            line-height: 1.5;
-            margin-top: 20px;
-        }
-        
-        /* 我的页面 */
-        .profile {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        
-        .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin-right: 20px;
-            overflow: hidden;
-        }
-        
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .user-info {
-            flex: 1;
-        }
-        
-        .user-info h2 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-        
-        .user-info p {
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        /* 退出登录按钮 */
-        #logoutBtn {
-            width: auto;
-            padding: 8px 15px;
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
-        
-        .review-status {
-            margin-top: 30px;
-        }
-        
-        .status-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-        
-        .status-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #FFD700;
-        }
-        
-        .status-desc {
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        /* 下单弹窗 */
-        .order-modal {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-        }
-        
-        .order-modal-content {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .order-modal-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #FFD700;
-        }
-        
-        .specs-modal {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .spec-modal {
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .spec-modal:hover {
-            background: rgba(255, 215, 0, 0.3);
-        }
-        
-        .spec-modal.active {
-            background: rgba(255, 215, 0, 0.5);
-            color: #FFD700;
-        }
-        
-        .spec-name {
-            flex: 1;
-            text-align: left;
-        }
-        
-        .spec-price {
-            font-weight: bold;
-            color: #ff6b6b;
-        }
-        
-        /* 支付弹窗 */
-        .payment-modal {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-        }
-        
-        .payment-content {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .payment-title {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: #FFD700;
-        }
-        
-        .payment-amount {
-            font-size: 1.8rem;
-            margin: 20px 0;
-            color: #ff6b6b;
-            font-weight: bold;
-        }
-        
-        .payment-notice {
-            margin: 20px 0;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-        }
-        
-        /* 审核弹窗 */
-        .review-modal {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-        }
-        
-        .review-content {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 30px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .review-title {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: #FFD700;
-        }
-        
-        .review-message {
-            margin-bottom: 20px;
-            color: rgba(255, 255, 255, 0.8);
-        }
-        
-        /* 后台管理 */
-        .admin-panel {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 100;
-        }
-        
-        .admin-btn {
-            padding: 8px 15px;
-            background: rgba(0, 0, 0, 0.5);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        .admin-modal {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-        }
-        
-        .admin-content {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 30px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .admin-title {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #FFD700;
-        }
-        
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .admin-header h2 {
-            margin: 0;
-        }
-        
-        .refresh-btn {
-            padding: 8px 15px;
-            background: #2196F3;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-        
-        .refresh-btn:hover {
-            background: #1976D2;
-            transform: translateY(-2px);
-        }
-        
-        .refresh-btn:active {
-            transform: translateY(0);
-        }
-        
-        .admin-section {
-            margin-bottom: 30px;
-        }
-        
-        .admin-section h3 {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            color: #FFD700;
-        }
-        
-        .user-list, .order-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .user-item, .order-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 15px;
-        }
-        
-        .order-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .approve-btn, .reject-btn {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        
-        .approve-btn {
-            background: #4CAF50;
-            color: white;
-        }
-        
-        .reject-btn {
-            background: #f44336;
-            color: white;
-        }
-        
-        /* 加载动画 */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-        }
-        
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #FFD700;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        .loading-text {
-            margin-top: 15px;
-            text-align: center;
-            color: white;
-            font-size: 1.1rem;
-        }
-        
-        /* 下单加载动画 */
-        .order-loading {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
-        }
-        
-        .order-loading-content {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 40px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .order-loading-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #FFD700;
-        }
-        
-        .order-loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #FFD700;
-            margin: 0 auto 20px;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        .order-loading-text {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1rem;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .orders-grid {
-                grid-template-columns: 1fr;
+    <!-- GSAP 动画库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- 统一的 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0a0a0a',
+                        secondary: '#ffffff',
+                        accent: '#1a1a1a',
+                        text: '#ffffff',
+                        textSecondary: '#b3b3b3'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
             }
-            
-            h1 {
-                font-size: 2rem;
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
             }
-            
-            .profile {
-                flex-direction: column;
-                text-align: center;
+            .glass {
+                background: rgba(255, 255, 255, 0.03);
+                backdrop-filter: blur(15px);
+                -webkit-backdrop-filter: blur(15px);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                border-radius: 24px;
             }
-            
-            .avatar {
-                margin-right: 0;
-                margin-bottom: 15px;
+            .glass-hover {
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             }
-            
-            .admin-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
+            .glass-hover:hover {
+                background: rgba(255, 255, 255, 0.07);
+                transform: translateY(-8px);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             }
-            
-            .refresh-btn {
-                align-self: stretch;
+            .text-gradient {
+                background: linear-gradient(90deg, #ffffff, #e0e0e0);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            .bg-glass {
+                background: rgba(10, 10, 10, 0.85);
+                backdrop-filter: blur(15px);
+                -webkit-backdrop-filter: blur(15px);
+            }
+            .liquid-effect {
+                position: relative;
+                overflow: hidden;
+            }
+            .liquid-effect::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(
+                    45deg,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.08) 50%,
+                    rgba(255, 255, 255, 0) 100%
+                );
+                transform: rotate(45deg);
+                animation: liquid-flow 12s linear infinite;
+            }
+            @keyframes liquid-flow {
+                0% {
+                    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+                }
+                100% {
+                    transform: translateX(100%) translateY(100%) rotate(45deg);
+                }
+            }
+            .elastic-button {
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                border-radius: 50px;
+                overflow: hidden;
+                position: relative;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .elastic-button::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.2),
+                    transparent
+                );
+                transition: all 0.6s;
+            }
+            .elastic-button:hover::before {
+                left: 100%;
+            }
+            .elastic-button:active {
+                transform: scale(0.97);
+            }
+            .ripple {
+                position: absolute;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                pointer-events: none;
+            }
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+            .nav-link {
+                position: relative;
+            }
+            .nav-link::after {
+                content: '';
+                position: absolute;
+                bottom: -5px;
+                left: 0;
+                width: 0;
+                height: 2px;
+                background-color: #64ffda;
+                transition: width 0.3s ease;
+            }
+            .nav-link:hover::after {
+                width: 100%;
+            }
+            .scroll-indicator {
+                animation: bounce 2s infinite;
+            }
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% {
+                    transform: translateY(0);
+                }
+                40% {
+                    transform: translateY(-20px);
+                }
+                60% {
+                    transform: translateY(-10px);
+                }
             }
         }
     </style>
 </head>
-<body>
-    <!-- 初始化加载动画 -->
-    <div class="loading" id="loading">
-        <div style="text-align: center;">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">系统初始化中...</div>
-        </div>
-    </div>
-    
-    <!-- 下单加载动画 -->
-    <div class="order-loading" id="orderLoading">
-        <div class="order-loading-content">
-            <div class="order-loading-spinner"></div>
-            <h2 class="order-loading-title">订单提交中</h2>
-            <p class="order-loading-text">正在保存订单数据到服务器，请稍候...</p>
-        </div>
-    </div>
-    
-    <!-- 游戏名称输入弹窗 -->
-    <div class="modal" id="gameNameModal">
-        <div class="modal-content">
-            <h2 class="modal-title">输入游戏名称</h2>
-            <input type="text" class="modal-input" id="gameNameInput" placeholder="请输入游戏名称">
-            <button class="modal-btn" id="gameNameConfirmBtn">下一步</button>
-        </div>
-    </div>
-    
-    <!-- 区服选择弹窗 -->
-    <div class="modal" id="serverModal">
-        <div class="modal-content">
-            <h2 class="modal-title">选择区服</h2>
-            <select class="modal-select" id="serverSelect">
-                <option value="">请选择区服</option>
-                <option value="QQ区">QQ区</option>
-                <option value="微信区">微信区</option>
-            </select>
-            <button class="modal-btn" id="serverConfirmBtn">进入</button>
-        </div>
-    </div>
-    
-    <!-- 主容器 -->
-    <div class="container" id="mainContainer">
-        <header>
-            <h1>欢迎来到游龙平民电竞点单</h1>
-            <div class="subtitle">全网最性价比的顶尖护</div>
-        </header>
-        
-        <!-- 主页 -->
-        <div class="page active" id="homePage">
-            <h2>热门订单</h2>
-            <div class="orders-grid" id="ordersGrid">
-                <!-- 订单将由JavaScript动态生成 -->
-            </div>
-        </div>
-        
-        <!-- 分类页面 -->
-        <div class="page" id="categoryPage">
-            <h2>分类</h2>
-            <div class="categories">
-                <div class="category active" data-category="all">全部</div>
-                <div class="category" data-category="equipment">装备</div>
-                <div class="category" data-category="skin">皮肤</div>
-                <div class="category" data-category="vip">VIP</div>
-                <div class="category" data-category="other">其他</div>
-            </div>
-            
-            <div class="orders-grid" id="categoryOrdersGrid">
-                <!-- 分类订单将由JavaScript动态生成 -->
-            </div>
-        </div>
-        
-        <!-- 消息页面 -->
-        <div class="page" id="messagePage">
-            <h2>联系客服</h2>
-            <div class="contact-info">
-                <div class="wechat-id">微信号: youlong6665</div>
-                <div class="contact-notice">
-                    如有任何问题，请添加以上微信号联系客服<br>
-                    工作时间：每天 7:00 - 23:00<br>
-                    我们会在15分钟内回复您
+<body class="bg-primary text-text overflow-x-hidden">
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 w-full z-50 bg-glass">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/f7ec9eda2af7467eafa8143caccb12ff~tplv-a9rns2rl98-image.image?rcl=202512102241403B6DF41BC61EB2BC3407&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1765982501&amp;x-signature=65VQsaS3TNdHneZ4NA0FfJpApsE%3D" alt="游龙电竞" class="h-12 w-12">
+                    <span class="ml-3 text-xl font-bold text-gradient">游龙平民电竞</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-10">
+                    <a href="#home" class="nav-link text-text hover:text-secondary transition-colors text-lg">最有</a>
+                    <a href="#about" class="nav-link text-text hover:text-secondary transition-colors text-lg">性价比</a>
+                    <a href="#contact" class="nav-link text-text hover:text-secondary transition-colors text-lg">护航</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="text-text focus:outline-none">
+                        <i class="fa fa-bars text-2xl"></i>
+                    </button>
                 </div>
             </div>
         </div>
-        
-        <!-- 我的页面 -->
-        <div class="page" id="profilePage">
-            <h2>我的信息</h2>
-            <div class="profile">
-                <div class="avatar">
-                    <!-- 随机头像 -->
-                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDgwIDgwIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iIzMzYzhmZiIvPjxjaXJjbGUgY3g9IjQwIiBjeT0iMzAiIHI9IjE1IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTI1IDYwIEEyMCAyMCA0IDAgMSA1NSA2MCBMNTUgNzAgQTIwIDIwIDAgMCAxIDI1IDcwIFoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=" alt="用户头像">
-                </div>
-                <div class="user-info">
-                    <h2 id="userName">用户名</h2>
-                    <p id="userServer">区服: Q区</p>
-                    <button class="modal-btn" id="logoutBtn">退出登录</button>
-                </div>
-            </div>
-            
-            <div class="review-status">
-                <h3>我的订单</h3>
-                <div id="userOrdersList">
-                    <!-- 用户订单将由JavaScript动态生成 -->
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-glass w-full">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex flex-col space-y-4">
+                    <a href="#home" class="text-text hover:text-secondary transition-colors py-3 text-lg">首页</a>
+                    <a href="#about" class="text-text hover:text-secondary transition-colors py-3 text-lg">关于我们</a>
+                    <a href="#contact" class="text-text hover:text-secondary transition-colors py-3 text-lg">联系我们</a>
                 </div>
             </div>
         </div>
-        
-        <!-- 底部导航 -->
-        <div class="bottom-nav">
-            <div class="nav-item active" data-page="homePage">
-                <div class="nav-icon">🏠</div>
-                <div>主页</div>
-            </div>
-            <div class="nav-item" data-page="categoryPage">
-                <div class="nav-icon">📂</div>
-                <div>分类</div>
-            </div>
-            <div class="nav-item" data-page="messagePage">
-                <div class="nav-icon">💬</div>
-                <div>消息</div>
-            </div>
-            <div class="nav-item" data-page="profilePage">
-                <div class="nav-icon">👤</div>
-                <div>我的</div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 下单弹窗 -->
-    <div class="order-modal" id="orderModal">
-        <div class="order-modal-content">
-            <h2 class="order-modal-title" id="orderModalTitle">选择规格</h2>
-            <div class="specs-modal" id="specsModal">
-                <!-- 规格将由JavaScript动态生成 -->
-            </div>
-            <button class="modal-btn" id="confirmOrderBtn">确认下单</button>
-            <button class="modal-btn" style="background: #6c757d; margin-top: 10px;" id="cancelOrderBtn">取消</button>
-        </div>
-    </div>
-    
-    <!-- 支付弹窗 -->
-    <div class="payment-modal" id="paymentModal">
-        <div class="payment-content">
-            <h2 class="payment-title">请完成支付</h2>
-            <div class="payment-amount" id="paymentAmount">¥0.00</div>
-            <div class="payment-notice">
-                请添加客服微信完成支付<br>
-                微信号【长按复制】: <strong>youlong6665</strong><br>
-                支付金额: <span id="paymentAmountText">¥0.00</span>
-            </div>
-            <button class="modal-btn" id="paymentConfirmBtn" style="margin-top: 20px;">好的</button>
-            <button class="modal-btn" style="background: #6c757d; margin-top: 10px;" id="paymentCloseBtn">取消</button>
-        </div>
-    </div>
-    
-    <!-- 审核弹窗 -->
-    <div class="review-modal" id="reviewModal">
-        <div class="review-content">
-            <h2 class="review-title" id="reviewTitle">审核通知</h2>
-            <p class="review-message" id="reviewMessage">您的订单正在审核中</p>
-            <button class="modal-btn" id="reviewCloseBtn">确定</button>
-        </div>
-    </div>
-    
-    <!-- 后台管理 -->
-    <div class="admin-panel">
-        <button class="admin-btn" id="adminBtn">管理后台</button>
-    </div>
-    
-    <!-- 后台密码验证 -->
-    <div class="modal" id="adminPasswordModal">
-        <div class="modal-content relative">
-            <button class="absolute top-2 right-2 text-white text-2xl" id="adminPasswordCloseBtn">&times;</button>
-            <h2 class="modal-title">后台管理</h2>
-            <p style="text-align: center; margin-bottom: 15px;">请输入管理员密码</p>
-            <input type="password" class="modal-input" id="adminPassword" placeholder="请输入密码">
-            <button class="modal-btn" id="adminPasswordBtn">进入</button>
-        </div>
-    </div>
-    
-    <div class="admin-modal" id="adminModal">
-        <div class="admin-content">
-            <div class="admin-header">
-                <h2 class="admin-title">后台管理系统</h2>
-                <button class="refresh-btn" id="adminRefreshBtn">
-                    <i class="fa fa-refresh" style="margin-right: 5px;"></i>刷新数据
-                </button>
-            </div>
-            
-            <div class="admin-section">
-                <h3>用户列表</h3>
-                <div class="user-list" id="userList">
-                    <!-- 用户列表将由JavaScript动态生成 -->
-                </div>
-            </div>
-            
-            <div class="admin-section">
-                <h3>订单列表</h3>
-                <div class="order-list" id="adminOrderList">
-                    <!-- 订单列表将由JavaScript动态生成 -->
-                </div>
-            </div>
-            
-            <button class="modal-btn" id="adminCloseBtn">关闭</button>
-        </div>
-    </div>
+    </nav>
 
+    <!-- 英雄区域 -->
+    <section id="home" class="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
+        <!-- 背景动画 -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-gradient-to-b from-primary to-accent"></div>
+            <div class="absolute top-0 left-0 w-full h-full">
+                <div id="particles-js" class="w-full h-full"></div>
+            </div>
+        </div>
+        
+        <!-- 主要内容 -->
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex flex-col items-center text-center">
+                <div class="animate-float mb-8">
+                    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/cd0ae9fd87c84143a813f9aaad99ebae~tplv-a9rns2rl98-image.image?rcl=20251206112323B9A131F2F69B29211A3D&amp;rk3s=8e244e95&amp;rrcfp=f06b921b&amp;x-expires=1767583415&amp;x-signature=qCSKyzHeHVdJ2Bz9d6RfeGRPGKw%3D" alt="游龙电竞" class="h-32 w-32 mx-auto">
+                </div>
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 text-gradient tracking-tight leading-tight" style="font-size: 32px;">欢迎来到游龙平民电竞</h1>
+                <p class="text-base md:text-xl text-textSecondary mb-12 max-w-xs md:max-w-2xl font-light text-center" style="font-size: 20px; font-weight: normal; font-style: italic;">拥有最强售后7天无理由退款</p>
+                
+                <!-- 联系信息 -->
+                <div class="glass glass-hover p-6 md:p-8 rounded-3xl mb-12 md:mb-16 max-w-md w-full border-t border-white/10">
+                    <p class="text-base md:text-xl mb-6 md:mb-8 text-center" style="font-style: italic; font-weight: bold; font-size: 16px; text-decoration: none;">点单前先请添加微信号【长按复制】</p>
+                    <div class="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-10 text-secondary break-all" style="text-decoration: none; font-size: 32px;">youlong6665</div>
+                    <div class="flex flex-col space-y-4 w-full">
+                        <a href="https://iill392.github.io/youlong666/" target="_blank" rel="noopener noreferrer" class="py-4 px-8 text-lg md:text-xl font-semibold text-secondary border border-secondary/30 hover:bg-white hover:text-primary transition-all text-center">
+                            立即进入点单
+                        </a>
+                        <a href="https://v.kuaishou.com/JqZtJx0X" target="_blank" rel="noopener noreferrer" class="py-4 px-8 text-lg md:text-xl font-semibold text-secondary border border-secondary/30 hover:bg-white hover:text-primary transition-all text-center">
+                           查看游龙最新作品
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 滚动指示器 -->
+                <div class="scroll-indicator mt-16">
+                    <i class="fa fa-angle-down text-3xl text-secondary"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我们 -->
+    <section id="about" class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/769aff962b524e6297b644d19b49e275~tplv-a9rns2rl98-image.image?rcl=20251210224307F4676C994F0BAF45C5BE&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1765982587&amp;x-signature=%2BlqoBL4iREPQk7tMvec9u%2FaEVm0%3D" alt="电竞团队" class="rounded-xl shadow-2xl liquid-effect">
+                </div>
+                <div class="md:w-1/2 md:pl-16">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-8 text-gradient">关于平民电竞</h2>
+                    <p class="text-lg text-textSecondary mb-6">’游龙平民电竞’成立于2025年，创建的目的就是做全网最性价比的顶尖护航，我们的初心是：不做便宜的野鸡护，只做便宜的顶尖护</p>
+                    <p class="text-lg text-textSecondary mb-8">我们提供专业的设备、教练指导和顶尖打手，帮助每一位老板都能把把得吃，享受游戏带来的乐趣。</p>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="glass glass-hover p-6 rounded-xl text-center">
+                            <div class="text-4xl font-bold text-secondary mb-2">5+</div>
+                            <div class="text-textSecondary">活跃成员</div>
+                        </div>
+                        <div class="glass glass-hover p-6 rounded-xl text-center">
+                            <div class="text-4xl font-bold text-secondary mb-2">96%</div>
+                            <div class="text-textSecondary">好评率</div>
+                        </div>
+                        <div class="glass glass-hover p-6 rounded-xl text-center">
+                            <div class="text-4xl font-bold text-secondary mb-2">100+</div>
+                            <div class="text-textSecondary">比赛场次</div>
+                        </div>
+                        <div class="glass glass-hover p-6 rounded-xl text-center">
+                            <div class="text-4xl font-bold text-secondary mb-2">10+</div>
+                            <div class="text-textSecondary">游戏项目</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- 联系我们 -->
+    <section id="contact" class="py-16 md:py-24 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-5xl font-bold mb-6 md:mb-8 text-gradient">微信号</h2>
+                <div class="text-4xl md:text-8xl font-bold text-secondary mb-6 md:mb-8 break-all">youlong6665</div>
+                <p class="text-base md:text-xl text-textSecondary mb-8 md:mb-12">进入游龙快手主页</p>
+                <a href="https://v.kuaishou.com/JqZtJx0X" target="_blank" rel="noopener noreferrer" class="inline-block py-4 px-8 md:px-12 text-lg md:text-xl font-semibold text-secondary border border-secondary/30 hover:bg-white hover:text-primary transition-all">
+                    立即访问快手主页
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-accent py-10">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/c71028d8e3524ae8a9b69c047536e70b~tplv-a9rns2rl98-image.image?rcl=20251210225010A1D99E7CF525A1AB44EE&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1765983011&amp;x-signature=iCc9dcOgt2bPDc94IkjtZ17O4LI%3D" alt="游龙电竞" class="h-10 w-10">
+                        <span class="ml-3 text-xl font-bold text-gradient">游龙平民电竞电竞</span>
+                    </div>
+                    <p class="text-textSecondary mt-2">打造全网最有性价比的护航</p>
+                </div>
+                <div class="flex flex-col md:flex-row md:space-x-16 space-y-6 md:space-y-0">
+                    <div>
+                        <h4 class="text-base md:text-lg font-semibold mb-4 text-secondary">
+</h4>
+                        <ul class="space-y-3">
+                            <li><a href="#home" class="text-textSecondary hover:text-secondary transition-colors"></a></li>
+                            <li><a href="#about" class="text-textSecondary hover:text-secondary transition-colors"></a></li>
+                            <li><a href="#contact" class="text-textSecondary hover:text-secondary transition-colors"></a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-base md:text-lg font-semibold mb-3 text-secondary">联系我们</h4>
+                        <ul class="space-y-2">
+                            <li class="text-textSecondary">微信：youlong6665</li>
+                           
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="back-to-top" class="fixed bottom-8 right-8 bg-secondary bg-opacity-20 p-3 rounded-full text-secondary opacity-0 invisible transition-all z-50 hover:bg-secondary hover:text-primary">
+        <i class="fa fa-arrow-up"></i>
+    </button>
+
+    <!-- particles.js 库 -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- 弹窗样式 -->
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-content {
+            background-color: #0a0a0a;
+            margin: 15% auto;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-button {
+            background: #ffffff;
+            color: #0a0a0a;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+        }
+        
+        .modal-button:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+        
+        .modal h2 {
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+        
+        .modal p {
+            color: #b3b3b3;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .terms-content {
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .terms-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .terms-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .terms-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+    </style>
+    
+    <!-- 协议弹窗 -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-4">用户协议与隐私政策</h2>
+            <div class="terms-content">
+                <p class="mb-4">欢迎来到游龙平民电竞俱乐部官网。在您使用本网站之前，请仔细阅读并同意以下条款：</p>
+                <p class="mb-4"><strong>1. 用户协议</strong></p>
+                <p class="mb-4">1.1 本网站仅供用户浏览和获取信息使用。</p>
+                <p class="mb-4">1.2 用户必须遵守中华人民共和国相关法律法规。</p>
+                <p class="mb-4">1.3 禁止使用本网站进行任何违法或不当行为。</p>
+                <p class="mb-4"><strong>2. 隐私政策</strong></p>
+                <p class="mb-4">2.1 我们尊重用户的隐私，不会泄露用户个人信息。</p>
+                <p class="mb-4">2.2 我们可能会收集一些基本信息用于网站优化。</p>
+                <p class="mb-4">2.3 用户可以随时要求删除其个人信息。</p>
+                <p class="mb-4"><strong>3. 免责声明</strong></p>
+                <p class="mb-4">3.1 本网站提供的信息仅供参考，不构成任何承诺。</p>
+                <p class="mb-4">3.2 对于因使用本网站而产生的任何损失，我们不承担责任。</p>
+                <p class="mb-4">3.3 我们有权随时修改网站内容和服务条款。</p>
+                <p>感谢您的理解与支持！</p>
+            </div>
+            <button id="agreeTerms" class="modal-button">我已阅读并同意</button>
+        </div>
+    </div>
+    
+    <!-- 跳转弹窗 -->
+    <div id="redirectModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-bold mb-4">欢迎回来！</h2>
+            <p class="text-lg mb-6">您想要立即跳转到我们的主页面吗？</p>
+            <button id="agreeRedirect" class="modal-button">立即跳转</button>
+            <button id="cancelRedirect" class="modal-button" style="background: rgba(255,255,255,0.1); color: #ffffff; margin-left: 1rem;">稍后再说</button>
+        </div>
+    </div>
+    
+    <!-- 自定义脚本 -->
     <script>
-        // GitHub云存储配置
-        const cloudConfig = {
-            storageType: 'github',
-            githubToken: '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',
-            githubRepo: 'iill392/game-order-system',
-            githubBranch: 'main',
-            apiEndpoint: ''
-        };
-
-        // GitHub存储管理器
-        const storageManager = {
-            // GitHub API基础URL
-            apiBase: 'https://api.github.com',
+        // 检查用户是否首次访问
+        document.addEventListener('DOMContentLoaded', function() {
+            const isFirstVisit = !localStorage.getItem('youlongVisited');
             
-            // 获取文件内容
-            async getFileContent(path) {
-                try {
-                    const response = await Promise.race([
-                        fetch(`${this.apiBase}/repos/${cloudConfig.githubRepo}/contents/${path}`, {
-                            headers: {
-                                'Authorization': `token ${cloudConfig.githubToken}`,
-                                'Accept': 'application/vnd.github.v3+json',
-                                'X-GitHub-Api-Version': '2022-11-28'
-                            }
-                        }),
-                        new Promise((_, reject) => setTimeout(() => reject(new Error('连接超时')), 10000))
-                    ]);
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        return {
-                            content: JSON.parse(this.base64Decode(data.content)),
-                            sha: data.sha
-                        };
-                    } else if (response.status === 404) {
-                        return null;
-                    } else {
-                        console.warn('GitHub API错误:', response.status, await response.text());
-                        return null;
-                    }
-                } catch (error) {
-                    console.error('获取GitHub文件失败:', error);
-                    return null;
-                }
-            },
+            if (isFirstVisit) {
+                // 首次访问，显示协议弹窗
+                showTermsModal();
+            } else {
+                // 非首次访问，显示跳转弹窗
+                setTimeout(showRedirectModal, 1000);
+            }
             
-            // 保存文件内容
-            async saveFileContent(path, content, sha = null) {
-                try {
-                    const body = {
-                        message: `更新${path} - ${new Date().toISOString()}`,
-                        content: this.base64Encode(JSON.stringify(content, null, 2)),
-                        branch: cloudConfig.githubBranch
-                    };
-                    
-                    if (sha) {
-                        body.sha = sha;
+            function showTermsModal() {
+                const termsModal = document.getElementById('termsModal');
+                termsModal.style.display = 'block';
+                
+                document.getElementById('agreeTerms').addEventListener('click', function() {
+                    termsModal.style.display = 'none';
+                    localStorage.setItem('youlongVisited', 'true');
+                    // 首次访问，显示欢迎信息
+                    alert('欢迎来到游龙平民电竞俱乐部！');
+                });
+            }
+            
+            function showRedirectModal() {
+                const redirectModal = document.getElementById('redirectModal');
+                redirectModal.style.display = 'block';
+                
+                document.getElementById('agreeRedirect').addEventListener('click', function() {
+                    redirectModal.style.display = 'none';
+                    // 跳转到指定网页
+                    window.location.href = 'https://iill392.github.io/youlong666/';
+                });
+                
+                document.getElementById('cancelRedirect').addEventListener('click', function() {
+                    redirectModal.style.display = 'none';
+                });
+            }
+            
+            // 点击弹窗外部关闭弹窗
+            window.addEventListener('click', function(event) {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
                     }
-                    
-                    const response = await fetch(`${this.apiBase}/repos/${cloudConfig.githubRepo}/contents/${path}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${cloudConfig.githubToken}`,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/vnd.github.v3+json',
-                            'X-GitHub-Api-Version': '2022-11-28'
+                });
+            });
+            
+            // 初始化 particles.js
+            particlesJS('particles-js', {
+                particles: {
+                    number: {
+                        value: 40,
+                        density: {
+                            enable: true,
+                            value_area: 800
+                        }
+                    },
+                    color: {
+                        value: '#ffffff'
+                    },
+                    shape: {
+                        type: 'circle',
+                        stroke: {
+                            width: 0,
+                            color: '#000000'
+                        }
+                    },
+                    opacity: {
+                        value: 0.5,
+                        random: true,
+                        anim: {
+                            enable: true,
+                            speed: 1,
+                            opacity_min: 0.1,
+                            sync: false
+                        }
+                    },
+                    size: {
+                        value: 4,
+                        random: true,
+                        anim: {
+                            enable: true,
+                            speed: 1,
+                            size_min: 0.5,
+                            sync: false
+                        }
+                    },
+                    line_linked: {
+                        enable: true,
+                        distance: 200,
+                        color: '#ffffff',
+                        opacity: 0.1,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 0.8,
+                        direction: 'none',
+                        random: true,
+                        straight: false,
+                        out_mode: 'out',
+                        bounce: false,
+                        attract: {
+                            enable: false,
+                            rotateX: 600,
+                            rotateY: 1200
+                        }
+                    }
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: {
+                        onhover: {
+                            enable: true,
+                            mode: 'grab'
                         },
-                        body: JSON.stringify(body)
-                    });
-                    
-                    if (!response.ok) {
-                        console.warn('GitHub保存失败:', response.status, await response.text());
-                        return false;
-                    }
-                    
-                    return true;
-                } catch (error) {
-                    console.error('保存GitHub文件失败:', error);
-                    return false;
-                }
-            },
-            
-            // 安全地编码字符串为base64（支持中文）
-            base64Encode(str) {
-                try {
-                    // 方法1：使用TextEncoder（现代浏览器）
-                    const encoder = new TextEncoder();
-                    const encoded = encoder.encode(str);
-                    let binary = '';
-                    const len = encoded.length;
-                    for (let i = 0; i < len; i++) {
-                        binary += String.fromCharCode(encoded[i]);
-                    }
-                    return btoa(binary);
-                } catch (error) {
-                    console.warn('TextEncoder失败，使用备用方法:', error);
-                    // 方法2：备用方法
-                    try {
-                        // 对特殊字符进行编码
-                        const utf8Bytes = unescape(encodeURIComponent(str));
-                        return btoa(utf8Bytes);
-                    } catch (e) {
-                        console.error('备用编码方法也失败:', e);
-                        // 方法3：最简单的回退方案
-                        return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-                            return String.fromCharCode('0x' + p1);
-                        }));
-                    }
-                }
-            },
-            
-            // 安全地解码base64为字符串（支持中文）
-            base64Decode(base64) {
-                try {
-                    // 方法1：使用TextDecoder（现代浏览器）
-                    const binary = atob(base64);
-                    const bytes = new Uint8Array(binary.length);
-                    for (let i = 0; i < binary.length; i++) {
-                        bytes[i] = binary.charCodeAt(i);
-                    }
-                    const decoder = new TextDecoder();
-                    return decoder.decode(bytes);
-                } catch (error) {
-                    console.warn('TextDecoder失败，使用备用方法:', error);
-                    // 方法2：备用方法
-                    try {
-                        const utf8Bytes = atob(base64);
-                        let result = '';
-                        for (let i = 0; i < utf8Bytes.length; i++) {
-                            result += String.fromCharCode(utf8Bytes.charCodeAt(i) & 255);
-                        }
-                        return decodeURIComponent(escape(result));
-                    } catch (e) {
-                        console.error('备用解码方法也失败:', e);
-                        // 方法3：最简单的回退方案
-                        return decodeURIComponent(atob(base64).split('').map(function(c) {
-                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                        }).join(''));
-                    }
-                }
-            },
-            
-            // 保存数据
-            async save(key, data) {
-                try {
-                    if (cloudConfig.storageType === 'github' && cloudConfig.githubToken && cloudConfig.githubRepo) {
-                        const path = `data/${key}.json`;
-                        const existingData = await this.getFileContent(path);
-                        const sha = existingData ? existingData.sha : null;
-                        const success = await this.saveFileContent(path, data, sha);
-                        
-                        if (success) {
-                            console.log(`数据已保存到GitHub: ${key}`);
-                            // 同时在本地保存一份备份
-                            try {
-                                localStorage.setItem(key, JSON.stringify(data));
-                            } catch (e) {
-                                console.warn('本地备份保存失败:', e);
+                        onclick: {
+                            enable: true,
+                            mode: 'push'
+                        },
+                        resize: true
+                    },
+                    modes: {
+                        grab: {
+                            distance: 120,
+                            line_linked: {
+                                opacity: 0.3
                             }
-                            return true;
-                        } else {
-                            console.warn('GitHub保存失败，回退到本地存储');
-                            localStorage.setItem(key, JSON.stringify(data));
-                            return true;
+                        },
+                        push: {
+                            particles_nb: 4
+                        },
+                        repulse: {
+                            distance: 100,
+                            duration: 0.4
                         }
-                    } else if (cloudConfig.storageType === 'customApi' && cloudConfig.apiEndpoint) {
-                        const response = await fetch(cloudConfig.apiEndpoint + '/save', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ key, data })
-                        });
-                        return response.ok;
-                    } else {
-                        localStorage.setItem(key, JSON.stringify(data));
-                        console.log(`数据已保存到本地: ${key}`);
-                        return true;
                     }
-                } catch (error) {
-                    console.error('保存数据失败:', error);
-                    try {
-                        localStorage.setItem(key, JSON.stringify(data));
-                        console.log('已回退到本地存储');
-                        return true;
-                    } catch (e) {
-                        console.error('本地存储也失败:', e);
-                        return false;
-                    }
-                }
-            },
+                },
+                retina_detect: true
+            });
 
-            // 获取数据
-            async get(key) {
-                try {
-                    if (cloudConfig.storageType === 'github' && cloudConfig.githubToken && cloudConfig.githubRepo) {
-                        const path = `data/${key}.json`;
-                        const data = await this.getFileContent(path);
-                        
-                        if (data) {
-                            console.log(`从GitHub获取数据: ${key}`);
-                            // 同时在本地保存一份缓存
-                            try {
-                                localStorage.setItem(key, JSON.stringify(data.content));
-                            } catch (e) {
-                                console.warn('本地缓存保存失败:', e);
-                            }
-                            return data.content;
-                        } else {
-                            console.log(`GitHub上没有找到数据: ${key}，尝试本地存储`);
-                            const localData = localStorage.getItem(key);
-                            if (localData) {
-                                console.log(`从本地获取数据: ${key}`);
-                                return JSON.parse(localData);
-                            }
-                            return null;
-                        }
-                    } else if (cloudConfig.storageType === 'customApi' && cloudConfig.apiEndpoint) {
-                        const response = await fetch(cloudConfig.apiEndpoint + '/get?key=' + key);
-                        if (response.ok) {
-                            return await response.json();
-                        }
-                        return null;
-                    } else {
-                        const data = localStorage.getItem(key);
-                        return data ? JSON.parse(data) : null;
-                    }
-                } catch (error) {
-                    console.error('获取数据失败:', error);
-                    try {
-                        const localData = localStorage.getItem(key);
-                        if (localData) {
-                            console.log('已回退到本地存储');
-                            return JSON.parse(localData);
-                        }
-                    } catch (e) {
-                        console.error('本地存储读取失败:', e);
-                    }
-                    return null;
-                }
-            },
+            // 移动端菜单切换
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            menuToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
 
-            // 删除数据
-            async remove(key) {
-                try {
-                    if (cloudConfig.storageType === 'github' && cloudConfig.githubToken && cloudConfig.githubRepo) {
-                        const path = `data/${key}.json`;
-                        const existingData = await this.getFileContent(path);
-                        
-                        if (existingData) {
-                            const response = await fetch(`${this.apiBase}/repos/${cloudConfig.githubRepo}/contents/${path}`, {
-                                method: 'DELETE',
-                                headers: {
-                                    'Authorization': `token ${cloudConfig.githubToken}`,
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    message: `删除${key} - ${new Date().toISOString()}`,
-                                    sha: existingData.sha,
-                                    branch: cloudConfig.githubBranch
-                                })
-                            });
-                            
-                            if (response.ok) {
-                                console.log(`从GitHub删除数据: ${key}`);
-                                localStorage.removeItem(key);
-                                return true;
-                            }
-                        }
-                    } else if (cloudConfig.storageType === 'customApi' && cloudConfig.apiEndpoint) {
-                        const response = await fetch(cloudConfig.apiEndpoint + '/remove?key=' + key, {
-                            method: 'DELETE'
-                        });
-                        return response.ok;
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 关闭移动端菜单
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
                     }
                     
-                    localStorage.removeItem(key);
-                    console.log(`从本地删除数据: ${key}`);
-                    return true;
-                } catch (error) {
-                    console.error('删除数据失败:', error);
-                    return false;
-                }
-            }
-        };
-        
-        // 用户数据
-        let currentUser = null;
-        let orders = [];
-        let currentOrder = null;
-        let selectedSpec = null;
-        
-        // 管理员密码
-        const ADMIN_PASSWORD = "admin123";
-        
-        // DOM元素
-        const loading = document.getElementById('loading');
-        const gameNameModal = document.getElementById('gameNameModal');
-        const gameNameInput = document.getElementById('gameNameInput');
-        const gameNameConfirmBtn = document.getElementById('gameNameConfirmBtn');
-        const serverModal = document.getElementById('serverModal');
-        const serverSelect = document.getElementById('serverSelect');
-        const serverConfirmBtn = document.getElementById('serverConfirmBtn');
-        const mainContainer = document.getElementById('mainContainer');
-        const userNameElement = document.getElementById('userName');
-        const userServerElement = document.getElementById('userServer');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const ordersGrid = document.getElementById('ordersGrid');
-        const categoryOrdersGrid = document.getElementById('categoryOrdersGrid');
-        const categories = document.querySelectorAll('.category');
-        const navItems = document.querySelectorAll('.nav-item');
-        const pages = document.querySelectorAll('.page');
-        const orderModal = document.getElementById('orderModal');
-        const orderModalTitle = document.getElementById('orderModalTitle');
-        const specsModal = document.getElementById('specsModal');
-        const confirmOrderBtn = document.getElementById('confirmOrderBtn');
-        const cancelOrderBtn = document.getElementById('cancelOrderBtn');
-        const paymentModal = document.getElementById('paymentModal');
-        const paymentAmount = document.getElementById('paymentAmount');
-        const paymentConfirmBtn = document.getElementById('paymentConfirmBtn');
-        const paymentCloseBtn = document.getElementById('paymentCloseBtn');
-        const reviewModal = document.getElementById('reviewModal');
-        const reviewTitle = document.getElementById('reviewTitle');
-        const reviewMessage = document.getElementById('reviewMessage');
-        const reviewCloseBtn = document.getElementById('reviewCloseBtn');
-        const userOrdersList = document.getElementById('userOrdersList');
-        const adminBtn = document.getElementById('adminBtn');
-        const adminPasswordModal = document.getElementById('adminPasswordModal');
-        const adminPasswordInput = document.getElementById('adminPassword');
-        const adminPasswordBtn = document.getElementById('adminPasswordBtn');
-        const adminModal = document.getElementById('adminModal');
-        const userList = document.getElementById('userList');
-        const adminOrderList = document.getElementById('adminOrderList');
-        const adminCloseBtn = document.getElementById('adminCloseBtn');
-        const adminRefreshBtn = document.getElementById('adminRefreshBtn');
-        const orderLoading = document.getElementById('orderLoading');
-        
-        // 初始化
-        async function init() {
-            try {
-                console.log('开始初始化应用...');
-                sessionStorage.removeItem('tempGameName');
-                
-                const savedUser = localStorage.getItem('currentUser');
-                if (savedUser) {
-                    currentUser = JSON.parse(savedUser);
-                    console.log('发现已登录用户:', currentUser.name);
-                    showMainApp();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // 返回顶部按钮
+            const backToTopButton = document.getElementById('back-to-top');
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.remove('opacity-0', 'invisible');
+                    backToTopButton.classList.add('opacity-100', 'visible');
                 } else {
-                    console.log('未发现登录用户，显示登录界面');
-                    gameNameModal.style.display = 'flex';
+                    backToTopButton.classList.remove('opacity-100', 'visible');
+                    backToTopButton.classList.add('opacity-0', 'invisible');
                 }
-                
-                generateOrders();
-                generateCategoryOrders();
-                
-                if (currentUser) {
-                    updateUserOrders();
-                    setupOrderNotifications();
-                }
-            } catch (error) {
-                console.error('初始化失败:', error);
-                alert('初始化失败，请刷新页面重试');
-                gameNameModal.style.display = 'flex';
-            } finally {
-                loading.style.display = 'none';
-            }
-        }
-        
-        // 生成订单数据（包含价格信息）
-        function getOrderData() {
-            return [
-                { 
-                    title: "传世武器转盘", 
-                    desc: "包含多种传世武器，提升战斗力", 
-                    category: "equipment", 
-                    specs: [
-                        { name: "立即下单(需加客服微信抽奖)", price: 1, originalPrice: 15 }
-                    ] 
-                },
-                { 
-                    title: "刮地皮单", 
-                    desc: "冰河禁区基础刮地皮，1元保100万", 
-                    category: "skin", 
-                    specs: [
-                        { name: "一保一【保100万+6包】", price: 1, originalPrice: 12 },
-                        { name: "二保一【保200万+转盘】", price: 5.9, originalPrice: 30 },
-                        { name: "三保一【保300万+转盘*2】", price: 7.9, originalPrice: 80 }
-                    ] 
-                },
-                { 
-                    title: "VIP会员套餐", 
-                    desc: "VIP特权，享受尊贵体验，免费护航2次", 
-                    category: "vip", 
-                    specs: [
-                        { name: "月卡", price: 15, originalPrice: 25 },
-                        { name: "季卡", price: 40, originalPrice: 60 },
-                        { name: "年卡", price: 120, originalPrice: 180 }
-                    ] 
-                },
-                { 
-                    title: "赌金单", 
-                    desc: "出8根金条，送1把传世武器", 
-                    category: "other", 
-                    specs: [
-                        { name: "一保一【保100万+7套】", price: 7.9, originalPrice: 8 },
-                        { name: "二保一【保200万+7套+随机金】", price: 18.9, originalPrice: 30 },
-                        { name: "三保一【保400万+7套+随机金*2+抽奖】", price: 19.9, originalPrice: 50 }
-                    ] 
-                },
-                { 
-                    title: "纯实力护", 
-                    desc: "纯有实力的护航", 
-                    category: "equipment", 
-                    specs: [
-                        { name: "一保一【保100万+7套+随机金】", price: 10, originalPrice: 18 },
-                        { name: "二保一【保300万+7套+随机金+抽奖*2】", price: 19.9, originalPrice: 45 },
-                        { name: "三保一【保400万+7套+随机金+抽奖*3】", price: 26.9, originalPrice: 90 }
-                    ] 
-                },
-                { 
-                    title: "老鼠单", 
-                    desc: "使用老鼠打法护航", 
-                    category: "other", 
-                    specs: [
-                        { name: "一保一【保100万+6套】", price: 3, originalPrice: 12 },
-                        { name: "二保一【保150万+随机金+抽奖】", price: 7.9, originalPrice: 30 },
-                        { name: "三保一【随机金*2+转盘*3】", price: 13.9, originalPrice: 50 }
-                    ] 
-                },
-                { 
-                    title: "主播护", 
-                    desc: "游龙亲自护航", 
-                    category: "equipment", 
-                    specs: [
-                        { name: "保200万【送7套+随机金+祝福语】", price: 16.9, originalPrice: 25 }
-                    ] 
-                },
-                { 
-                    title: "淘汰人机单", 
-                    desc: "1图每淘汰一个人机护航+10万，淘汰真人+30万", 
-                    category: "other", 
-                    specs: [
-                        { name: "保底100万", price: 19.9, originalPrice: 15 },
-                        { name: "保底200万", price: 23.9, originalPrice: 45 },
-                        { name: "保底300万", price: 29.9, originalPrice: 100 }
-                    ] 
-                },
-                { 
-                    title: "赌2金单", 
-                    desc: "一局没有出【2根金条】一直护", 
-                    category: "skin", 
-                    specs: [
-                        { name: "一保一【送7套+金+抽奖】", price: 29.9, originalPrice: 20 },
-                        { name: "二保一【送7套+金+抽奖*2】", price: 49.9, originalPrice: 50 },
-                        { name: "三保一【送7套+金*2+抽奖*5】", price: 59.9, originalPrice: 110 }
-                    ] 
-                },
-                { 
-                    title: "赌橙单", 
-                    desc: "一局没出橙色变卖物一直护", 
-                    category: "equipment", 
-                    specs: [
-                        { name: "一保一【送7套+随机金】", price: 29.9, originalPrice: 12 },
-                        { name: "二保一【送7套+随机金+抽奖*2】", price: 49.9, originalPrice: 30 },
-                        { name: "三保一【送7套+随机金*2+抽奖*5】", price: 59.9, originalPrice: 45 }
-                    ] 
-                }
-            ];
-        }
-        
-        // 计算价格范围
-        function getPriceRange(specs) {
-            if (!specs || specs.length === 0) return "价格待定";
-            
-            const prices = specs.map(spec => spec.price);
-            const minPrice = Math.min(...prices);
-            const maxPrice = Math.max(...prices);
-            
-            if (minPrice === maxPrice) {
-                return `¥${minPrice}`;
-            } else {
-                return `¥${minPrice} - ¥${maxPrice}`;
-            }
-        }
-        
-        // 计算原价范围
-        function getOriginalPriceRange(specs) {
-            if (!specs || specs.length === 0) return "";
-            
-            const originalPrices = specs.map(spec => spec.originalPrice);
-            const minOriginalPrice = Math.min(...originalPrices);
-            const maxOriginalPrice = Math.max(...originalPrices);
-            
-            if (minOriginalPrice === maxOriginalPrice) {
-                return `原价: ¥${minOriginalPrice}`;
-            } else {
-                return `原价: ¥${minOriginalPrice} - ¥${maxOriginalPrice}`;
-            }
-        }
-        
-        // 生成订单数据
-        function generateOrders() {
-            const orderData = getOrderData();
-            
-            ordersGrid.innerHTML = '';
-            
-            orderData.forEach((order, index) => {
-                const priceRange = getPriceRange(order.specs);
-                const originalPriceRange = getOriginalPriceRange(order.specs);
-                
-                const orderCard = document.createElement('div');
-                orderCard.className = 'order-card';
-                orderCard.innerHTML = `
-                    <div class="order-title">${order.title}</div>
-                    <div class="order-price-range">${priceRange}</div>
-                    <div class="order-original-price">${originalPriceRange}</div>
-                    <div class="order-desc">${order.desc}</div>
-                    <button class="order-btn" data-order="${index}">立即下单</button>
-                `;
-                ordersGrid.appendChild(orderCard);
             });
             
-            document.querySelectorAll('.order-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const orderIndex = parseInt(this.dataset.order);
-                    showOrderModal(orderIndex);
+            backToTopButton.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
                 });
             });
-        }
-        
-        // 生成分类订单
-        function generateCategoryOrders() {
-            const orderData = getOrderData();
+
+            // 表单提交
+            const contactForm = document.getElementById('contact-form');
             
-            categoryOrdersGrid.innerHTML = '';
-            filterOrdersByCategory('all');
-            
-            categories.forEach(category => {
-                category.addEventListener('click', function() {
-                    const categoryType = this.dataset.category;
-                    categories.forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    filterOrdersByCategory(categoryType);
-                });
-            });
-        }
-        
-        // 根据分类过滤订单
-        function filterOrdersByCategory(category) {
-            const orderData = getOrderData();
-            categoryOrdersGrid.innerHTML = '';
-            
-            let filteredOrders = orderData;
-            if (category !== 'all') {
-                filteredOrders = orderData.filter(order => order.category === category);
-            }
-            
-            filteredOrders.forEach((order, index) => {
-                const priceRange = getPriceRange(order.specs);
-                const originalPriceRange = getOriginalPriceRange(order.specs);
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
                 
-                const orderCard = document.createElement('div');
-                orderCard.className = 'order-card';
-                orderCard.innerHTML = `
-                    <div class="order-title">${order.title}</div>
-                    <div class="order-price-range">${priceRange}</div>
-                    <div class="order-original-price">${originalPriceRange}</div>
-                    <div class="order-desc">${order.desc}</div>
-                    <button class="order-btn" data-order="${orderData.indexOf(order)}">立即下单</button>
-                `;
-                categoryOrdersGrid.appendChild(orderCard);
-            });
-            
-            document.querySelectorAll('#categoryOrdersGrid .order-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const orderIndex = parseInt(this.dataset.order);
-                    showOrderModal(orderIndex);
-                });
-            });
-        }
-        
-        // 显示下单弹窗
-        function showOrderModal(orderIndex) {
-            const orderData = getOrderData();
-            const order = orderData[orderIndex];
-            
-            currentOrder = order;
-            orderModalTitle.textContent = order.title;
-            
-            specsModal.innerHTML = '';
-            order.specs.forEach((spec, index) => {
-                const specElement = document.createElement('div');
-                specElement.className = 'spec-modal';
-                specElement.dataset.spec = index;
-                specElement.dataset.price = spec.price;
-                specElement.innerHTML = `
-                    <div class="spec-name">${spec.name}</div>
-                    <div class="spec-price">¥${spec.price}</div>
-                `;
-                specsModal.appendChild(specElement);
-            });
-            
-            document.querySelectorAll('.spec-modal').forEach(spec => {
-                spec.addEventListener('click', function() {
-                    document.querySelectorAll('.spec-modal').forEach(s => s.classList.remove('active'));
-                    this.classList.add('active');
-                    selectedSpec = parseInt(this.dataset.spec);
-                });
-            });
-            
-            orderModal.style.display = 'flex';
-        }
-        
-        // 显示主应用
-        async function showMainApp() {
-            console.log('显示主应用界面');
-            gameNameModal.style.display = 'none';
-            serverModal.style.display = 'none';
-            mainContainer.style.display = 'block';
-            
-            userNameElement.textContent = currentUser.name;
-            userServerElement.textContent = `区服: ${currentUser.server}`;
-            
-            setTimeout(() => {
-                showReviewMessage('欢迎', `欢迎回来，${currentUser.name}！`);
-            }, 1000);
-        }
-        
-        // 显示审核消息
-        function showReviewMessage(title, message) {
-            reviewTitle.textContent = title;
-            reviewMessage.textContent = message;
-            reviewModal.style.display = 'flex';
-        }
-        
-        // 显示支付弹窗
-        function showPaymentModal(order, spec) {
-            const specData = order.specs[spec];
-            const amount = specData.price;
-            
-            paymentAmount.textContent = `¥${amount}`;
-            document.getElementById('paymentAmountText').textContent = `¥${amount}`;
-            paymentModal.style.display = 'flex';
-        }
-        
-        // 显示订单加载动画
-        function showOrderLoading() {
-            orderLoading.style.display = 'flex';
-        }
-        
-        // 隐藏订单加载动画
-        function hideOrderLoading() {
-            orderLoading.style.display = 'none';
-        }
-        
-        // 更新用户订单
-        async function updateUserOrders() {
-            try {
-                userOrdersList.innerHTML = '<div class="status-card"><div class="status-desc">正在加载订单...</div></div>';
+                // 获取表单数据
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value;
                 
-                const allOrders = await storageManager.get('orders') || [];
-                const userOrders = allOrders.filter(order => order.userId === currentUser.id);
-                
-                userOrdersList.innerHTML = '';
-                
-                if (userOrders.length === 0) {
-                    userOrdersList.innerHTML = '<div class="status-card"><div class="status-desc">暂无订单</div></div>';
+                // 简单验证
+                if (!name || !email || !subject || !message) {
+                    alert('请填写所有必填字段');
                     return;
                 }
                 
-                userOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                // 模拟表单提交
+                alert('留言已发送，我们会尽快回复您！');
+                contactForm.reset();
+            });
+
+            // 移除所有复杂的JavaScript跳转逻辑，让浏览器原生处理链接
+            // 这样可以确保链接能够正常跳转
+            
+            // 创建点击波纹效果
+            function createRipple(e, button) {
+                const circle = document.createElement('div');
+                const diameter = Math.max(button.clientWidth, button.clientHeight);
+                const radius = diameter / 2;
                 
-                userOrders.forEach(order => {
-                    const statusCard = document.createElement('div');
-                    statusCard.className = 'status-card';
-                    
-                    let statusText = '';
-                    if (order.status === 'pending') {
-                        statusText = '状态: 正在审核中';
-                    } else if (order.status === 'approved') {
-                        statusText = '状态: 审核通过';
-                    } else {
-                        statusText = `状态: 审核未通过 - 理由: ${order.reason || '信息不完整'}`;
+                circle.style.width = circle.style.height = `${diameter}px`;
+                circle.style.left = `${e.clientX - button.getBoundingClientRect().left - radius}px`;
+                circle.style.top = `${e.clientY - button.getBoundingClientRect().top - radius}px`;
+                circle.classList.add('ripple');
+                
+                const ripple = button.getElementsByClassName('ripple')[0];
+                if (ripple) {
+                    ripple.remove();
+                }
+                
+                button.appendChild(circle);
+            }
+
+            // GSAP 动画
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // 页面加载动画
+            gsap.set('body', {opacity: 0});
+            gsap.to('body', {opacity: 1, duration: 1});
+            
+            // 英雄区域入场动画
+            const heroTimeline = gsap.timeline({
+                delay: 0.3,
+                ease: "power3.out"
+            });
+            
+            heroTimeline.from('.animate-float', {
+                opacity: 0,
+                scale: 0.5,
+                duration: 1.2,
+                ease: "elastic.out(1, 0.5)"
+            })
+            .from('h1.text-gradient', {
+                opacity: 0,
+                y: 30,
+                duration: 0.8
+            }, "-=0.5")
+            .from('p.text-textSecondary', {
+                opacity: 0,
+                y: 20,
+                duration: 0.8
+            }, "-=0.3")
+            .from('.glass.glass-hover', {
+                opacity: 0,
+                y: 40,
+                duration: 1,
+                ease: "back.out(1.7)"
+            }, "-=0.3");
+            
+            // 滚动触发动画
+            gsap.utils.toArray('.text-gradient:not(h1)').forEach(element => {
+                gsap.from(element, {
+                    opacity: 0,
+                    y: 30,
+                    duration: 0.8,
+                    scrollTrigger: {
+                        trigger: element,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none'
                     }
-                    
-                    const formattedTime = order.timestamp ? new Date(order.timestamp).toLocaleString() : '未知时间';
-                    
-                    statusCard.innerHTML = `
-                        <div class="status-title">${order.orderTitle} - ${order.spec}</div>
-                        <div class="status-desc">订单金额: ¥${order.price}</div>
-                        <div class="status-desc">${statusText}</div>
-                        <div class="status-desc">下单时间: ${formattedTime}</div>
-                    `;
-                    userOrdersList.appendChild(statusCard);
                 });
-            } catch (error) {
-                console.error('更新用户订单失败:', error);
-                userOrdersList.innerHTML = `
-                    <div class="status-card">
-                        <div class="status-desc">加载订单失败: ${error.message}</div>
-                        <button class="modal-btn" style="width: auto; margin-top: 10px;" onclick="loadMockOrders()">查看演示数据</button>
-                    </div>
-                `;
-            }
-        }
-        
-        // 加载模拟订单数据
-        function loadMockOrders() {
-            const mockOrders = [
-                {
-                    id: 'mock-1',
-                    orderTitle: '高级装备礼包',
-                    spec: '标准版(3件)',
-                    price: 25,
-                    status: 'approved',
-                    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000)
-                },
-                {
-                    id: 'mock-2',
-                    orderTitle: '稀有皮肤抽奖',
-                    spec: '稀有皮肤',
-                    price: 20,
-                    status: 'pending',
-                    timestamp: new Date(Date.now() - 30 * 60 * 1000)
-                },
-                {
-                    id: 'mock-3',
-                    orderTitle: 'VIP会员套餐',
-                    spec: '月卡',
-                    price: 15,
-                    status: 'rejected',
-                    reason: '信息不完整，请提供更多详情',
-                    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000)
-                }
-            ];
-            
-            userOrdersList.innerHTML = '';
-            
-            mockOrders.forEach(order => {
-                const statusCard = document.createElement('div');
-                statusCard.className = 'status-card';
-                
-                let statusText = '';
-                if (order.status === 'pending') {
-                    statusText = '状态: 正在审核中（演示数据）';
-                } else if (order.status === 'approved') {
-                    statusText = '状态: 审核通过（演示数据）';
-                } else {
-                    statusText = `状态: 审核未通过（演示数据） - 理由: ${order.reason || '信息不完整'}`;
-                }
-                
-                statusCard.innerHTML = `
-                    <div class="status-title">${order.orderTitle} - ${order.spec}</div>
-                    <div class="status-desc">订单金额: ¥${order.price}</div>
-                    <div class="status-desc">${statusText}</div>
-                    <div class="status-desc">下单时间: ${order.timestamp.toLocaleString()}</div>
-                `;
-                userOrdersList.appendChild(statusCard);
             });
-        }
-        
-        // 设置订单通知监听
-        function setupOrderNotifications() {
-            if (!currentUser) return;
             
-            const checkOrderStatus = async () => {
-                try {
-                    const allOrders = await storageManager.get('orders') || [];
-                    const userOrders = allOrders.filter(order => order.userId === currentUser.id);
-                    
-                    userOrders.forEach(order => {
-                        const localOrders = JSON.parse(localStorage.getItem('localOrders') || '{}');
-                        const oldStatus = localOrders[order.id];
-                        
-                        if (oldStatus && oldStatus !== order.status) {
-                            if (order.status === 'approved') {
-                                showReviewMessage('审核通过', '您的订单已通过审核！');
-                            } else if (order.status === 'rejected') {
-                                showReviewMessage('审核未通过', `您的订单未通过审核，理由: ${order.reason || '信息不符合要求'}`);
-                            }
+            // 卡片动画
+            gsap.utils.toArray('.glass-hover:not(.hero .glass-hover)').forEach((element, index) => {
+                gsap.from(element, {
+                    opacity: 0,
+                    y: 40,
+                    duration: 0.8,
+                    delay: index * 0.1,
+                    scrollTrigger: {
+                        trigger: element,
+                        start: 'top 85%',
+                        toggleActions: 'play none none none'
+                    }
+                });
+            });
+            
+            // 图片动画
+            gsap.from('.liquid-effect', {
+                opacity: 0,
+                scale: 0.9,
+                duration: 1.2,
+                scrollTrigger: {
+                    trigger: '.liquid-effect',
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                }
+            });
+            
+            // 数字计数动画
+            gsap.utils.toArray('.glass-hover .text-4xl').forEach(element => {
+                const target = parseInt(element.textContent);
+                const suffix = element.textContent.replace(/\d/g, '');
+                
+                gsap.fromTo(element, 
+                    {textContent: '0'},
+                    {
+                        textContent: target,
+                        duration: 2,
+                        ease: "power2.out",
+                        snap: {textContent: 1},
+                        onUpdate: function() {
+                            element.textContent = Math.round(this.targets()[0].textContent) + suffix;
+                        },
+                        scrollTrigger: {
+                            trigger: element,
+                            start: 'top 80%',
+                            toggleActions: 'play none none none'
                         }
-                        
-                        localOrders[order.id] = order.status;
-                        localStorage.setItem('localOrders', JSON.stringify(localOrders));
-                    });
-                } catch (error) {
-                    console.error('检查订单状态失败:', error);
-                }
-            };
+                    }
+                );
+            });
             
-            setInterval(checkOrderStatus, 30000);
-            checkOrderStatus();
-        }
-        
-        // 更新后台管理界面
-        async function updateAdminPanel() {
-            try {
-                userList.innerHTML = '<div class="user-item">正在加载用户数据...</div>';
-                adminOrderList.innerHTML = '<div class="order-item">正在加载订单数据...</div>';
-                
-                const allUsers = await storageManager.get('users') || [];
-                
-                userList.innerHTML = '';
-                
-                if (allUsers.length === 0) {
-                    userList.innerHTML = '<div class="user-item">暂无用户数据</div>';
-                } else {
-                    allUsers.forEach(user => {
-                        const userItem = document.createElement('div');
-                        userItem.className = 'user-item';
-                        
-                        const formattedTime = user.registerTime ? new Date(user.registerTime).toLocaleString() : '未知时间';
-                        
-                        userItem.innerHTML = `
-                            <div><strong>${user.name}</strong> - ${user.server}</div>
-                            <div>注册时间: ${formattedTime}</div>
-                        `;
-                        userList.appendChild(userItem);
-                    });
-                }
-                
-                adminOrderList.innerHTML = '';
-                const allOrders = await storageManager.get('orders') || [];
-                
-                if (allOrders.length === 0) {
-                    adminOrderList.innerHTML = '<div class="order-item">暂无订单数据</div>';
-                } else {
-                    allOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            // 粒子背景交互增强
+            document.addEventListener('mousemove', function(e) {
+                const particles = document.querySelectorAll('#particles-js canvas');
+                if (particles.length) {
+                    const canvas = particles[0];
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
                     
-                    allOrders.forEach(order => {
-                        const orderItem = document.createElement('div');
-                        orderItem.className = 'order-item';
-                        
-                        const formattedTime = order.timestamp ? new Date(order.timestamp).toLocaleString() : '未知时间';
-                        
-                        orderItem.innerHTML = `
-                            <div><strong>订单 #${order.id}</strong></div>
-                            <div>用户: ${order.userName} (${order.userServer})</div>
-                            <div>商品: ${order.orderTitle} - ${order.spec}</div>
-                            <div>金额: ¥${order.price}</div>
-                            <div>时间: ${formattedTime}</div>
-                            <div>状态: ${order.status === 'pending' ? '审核中' : order.status === 'approved' ? '已通过' : '未通过'}</div>
-                            ${order.status === 'pending' ? `
-                                <div class="order-actions">
-                                    <button class="approve-btn" data-order="${order.id}">通过</button>
-                                    <button class="reject-btn" data-order="${order.id}">拒绝</button>
-                                </div>
-                            ` : ''}
-                        `;
-                        adminOrderList.appendChild(orderItem);
-                    });
-                    
-                    document.querySelectorAll('.approve-btn').forEach(btn => {
-                        btn.addEventListener('click', async function() {
-                            const orderId = this.dataset.order;
-                            try {
-                                const allOrders = await storageManager.get('orders') || [];
-                                const orderIndex = allOrders.findIndex(order => order.id === orderId);
-                                
-                                if (orderIndex !== -1) {
-                                    allOrders[orderIndex].status = 'approved';
-                                    allOrders[orderIndex].updatedAt = new Date().toISOString();
-                                    
-                                    await storageManager.save('orders', allOrders);
-                                    updateAdminPanel();
-                                    
-                                    const order = allOrders[orderIndex];
-                                    if (currentUser && order.userId === currentUser.id) {
-                                        updateUserOrders();
-                                        showReviewMessage('审核通过', '您的订单已通过审核！');
-                                    }
-                                    
-                                    alert('审核通过！');
-                                }
-                            } catch (error) {
-                                console.error('审核订单失败:', error);
-                                alert('审核失败，请重试');
-                            }
-                        });
-                    });
-                    
-                    document.querySelectorAll('.reject-btn').forEach(btn => {
-                        btn.addEventListener('click', async function() {
-                            const orderId = this.dataset.order;
-                            const reason = prompt('请输入拒绝理由:', '信息不符合要求');
-                            
-                            if (reason === null) return;
-                            
-                            try {
-                                const allOrders = await storageManager.get('orders') || [];
-                                const orderIndex = allOrders.findIndex(order => order.id === orderId);
-                                
-                                if (orderIndex !== -1) {
-                                    allOrders[orderIndex].status = 'rejected';
-                                    allOrders[orderIndex].reason = reason;
-                                    allOrders[orderIndex].updatedAt = new Date().toISOString();
-                                    
-                                    await storageManager.save('orders', allOrders);
-                                    updateAdminPanel();
-                                    
-                                    const order = allOrders[orderIndex];
-                                    if (currentUser && order.userId === currentUser.id) {
-                                        updateUserOrders();
-                                        showReviewMessage('审核未通过', `您的订单未通过审核，理由: ${reason}`);
-                                    }
-                                    
-                                    alert('已拒绝订单！');
-                                }
-                            } catch (error) {
-                                console.error('拒绝订单失败:', error);
-                                alert('操作失败，请重试');
-                            }
-                        });
-                    });
+                    // 向粒子系统发送鼠标位置信息
+                    window.pJSDom[0].pJS.interactivity.mouse.pos_x = x;
+                    window.pJSDom[0].pJS.interactivity.mouse.pos_y = y;
+                    window.pJSDom[0].pJS.interactivity.events.mouse.move(event);
                 }
-            } catch (error) {
-                console.error('更新后台面板失败:', error);
-                userList.innerHTML = '<div class="user-item">加载用户数据失败</div>';
-                adminOrderList.innerHTML = '<div class="order-item">加载订单数据失败</div>';
-                alert('加载数据失败，请刷新页面重试');
-            }
-        }
-        
-        // 游戏名称弹窗确认事件
-        gameNameConfirmBtn.addEventListener('click', function() {
-            const name = gameNameInput.value.trim();
-            if (!name) {
-                alert('请输入游戏名称');
-                return;
-            }
-            console.log('游戏名称输入:', name);
-            sessionStorage.setItem('tempGameName', name);
-            gameNameModal.style.display = 'none';
-            serverModal.style.display = 'flex';
-        });
-        
-        // 区服弹窗确认事件
-        serverConfirmBtn.addEventListener('click', async function() {
-            const server = serverSelect.value;
-            const name = sessionStorage.getItem('tempGameName');
+            });
             
-            console.log('区服选择:', server);
-            console.log('游戏名称:', name);
-            
-            if (!server) {
-                alert('请选择区服');
-                return;
-            }
-            
-            if (!name) {
-                alert('游戏名称丢失，请重新输入');
-                serverModal.style.display = 'none';
-                gameNameModal.style.display = 'flex';
-                return;
-            }
-            
-            try {
-                loading.style.display = 'flex';
-                
-                const userData = {
-                    id: 'user-' + Date.now(),
-                    name: name,
-                    server: server,
-                    registerTime: new Date().toISOString()
-                };
-                
-                const allUsers = await storageManager.get('users') || [];
-                allUsers.push(userData);
-                await storageManager.save('users', allUsers);
-                
-                currentUser = userData;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                sessionStorage.removeItem('tempGameName');
-                
-                serverModal.style.display = 'none';
-                showMainApp();
-                console.log('用户登录成功');
-            } catch (error) {
-                console.error('创建用户失败:', error);
-                alert('登录失败，请重试');
-            } finally {
-                loading.style.display = 'none';
-            }
-        });
-        
-        // 退出登录事件
-        logoutBtn.addEventListener('click', async function() {
-            try {
-                localStorage.removeItem('currentUser');
-                localStorage.removeItem('localOrders');
-                currentUser = null;
-                
-                mainContainer.style.display = 'none';
-                gameNameModal.style.display = 'flex';
-                
-                gameNameInput.value = '';
-                serverSelect.value = '';
-            } catch (error) {
-                console.error('退出登录失败:', error);
-                alert('退出失败，请重试');
-            }
-        });
-        
-        // 导航切换
-        navItems.forEach(item => {
-            item.addEventListener('click', function() {
-                const pageId = this.dataset.page;
-                
-                navItems.forEach(nav => nav.classList.remove('active'));
-                this.classList.add('active');
-                
-                pages.forEach(page => page.classList.remove('active'));
-                document.getElementById(pageId).classList.add('active');
-                
-                if (pageId === 'profilePage' && currentUser) {
-                    updateUserOrders();
+            // 触摸设备交互增强
+            document.addEventListener('touchmove', function(e) {
+                if (e.touches.length > 0) {
+                    const touch = e.touches[0];
+                    const particles = document.querySelectorAll('#particles-js canvas');
+                    if (particles.length) {
+                        const canvas = particles[0];
+                        const rect = canvas.getBoundingClientRect();
+                        const x = touch.clientX - rect.left;
+                        const y = touch.clientY - rect.top;
+                        
+                        // 向粒子系统发送触摸位置信息
+                        window.pJSDom[0].pJS.interactivity.mouse.pos_x = x;
+                        window.pJSDom[0].pJS.interactivity.mouse.pos_y = y;
+                        window.pJSDom[0].pJS.interactivity.events.touchmove(event);
+                    }
                 }
             });
         });
-        
-        // 确认下单
-        confirmOrderBtn.addEventListener('click', async function() {
-            const selectedSpecElement = document.querySelector('.spec-modal.active');
-            
-            if (!selectedSpecElement) {
-                alert('请选择一个规格');
-                return;
-            }
-            
-            try {
-                const specData = currentOrder.specs[selectedSpec];
-                
-                // 显示加载动画
-                showOrderLoading();
-                
-                // 保存订单数据到服务器
-                const orderData = {
-                    id: 'order-' + Date.now(),
-                    userId: currentUser.id,
-                    userName: currentUser.name,
-                    userServer: currentUser.server,
-                    orderTitle: currentOrder.title,
-                    spec: specData.name,
-                    price: specData.price,
-                    originalPrice: specData.originalPrice,
-                    status: 'pending',
-                    timestamp: new Date().toISOString()
-                };
-                
-                console.log('正在创建订单...', orderData);
-                
-                // 模拟网络延迟，展示加载效果
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                const allOrders = await storageManager.get('orders') || [];
-                allOrders.push(orderData);
-                const saveResult = await storageManager.save('orders', allOrders);
-                
-                if (!saveResult) {
-                    throw new Error('保存订单到服务器失败');
-                }
-                
-                console.log('订单创建成功，ID:', orderData.id);
-                
-                // 关闭加载动画
-                hideOrderLoading();
-                
-                // 关闭下单弹窗，显示支付弹窗
-                orderModal.style.display = 'none';
-                showPaymentModal(currentOrder, selectedSpec);
-                
-                // 更新用户订单列表
-                await updateUserOrders();
-            } catch (error) {
-                console.error('创建订单失败:', error);
-                // 关闭加载动画
-                hideOrderLoading();
-                alert('下单失败: ' + error.message);
-            }
-        });
-        
-        // 取消下单
-        cancelOrderBtn.addEventListener('click', function() {
-            orderModal.style.display = 'none';
-            selectedSpec = null;
-        });
-        
-        // 支付确认
-        paymentConfirmBtn.addEventListener('click', function() {
-            paymentModal.style.display = 'none';
-            showReviewMessage('支付成功', '您的订单支付成功，正在等待审核！');
-            selectedSpec = null;
-        });
-        
-        // 支付取消
-        paymentCloseBtn.addEventListener('click', function() {
-            paymentModal.style.display = 'none';
-            selectedSpec = null;
-        });
-        
-        // 审核弹窗关闭
-        reviewCloseBtn.addEventListener('click', function() {
-            reviewModal.style.display = 'none';
-        });
-        
-        // 后台管理按钮点击事件
-        adminBtn.addEventListener('click', function() {
-            adminPasswordModal.style.display = 'flex';
-        });
-        
-        // 后台密码验证
-        adminPasswordBtn.addEventListener('click', function() {
-            const password = adminPasswordInput.value;
-            
-            if (password === ADMIN_PASSWORD) {
-                adminPasswordModal.style.display = 'none';
-                adminModal.style.display = 'flex';
-                adminPasswordInput.value = '';
-                updateAdminPanel();
-            } else {
-                alert('密码错误！');
-                adminPasswordInput.value = '';
-            }
-        });
-        
-        // 后台刷新按钮点击事件
-        adminRefreshBtn.addEventListener('click', async function() {
-            // 添加点击反馈
-            const originalText = this.innerHTML;
-            this.innerHTML = '<i class="fa fa-refresh fa-spin" style="margin-right: 5px;"></i>刷新中...';
-            this.disabled = true;
-            
-            try {
-                await updateAdminPanel();
-                // 短暂显示成功提示
-                const originalBackground = this.style.background;
-                this.style.background = '#4CAF50';
-                setTimeout(() => {
-                    this.style.background = originalBackground;
-                }, 300);
-            } catch (error) {
-                console.error('刷新后台数据失败:', error);
-            } finally {
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                    this.disabled = false;
-                }, 500);
-            }
-        });
-        
-        adminCloseBtn.addEventListener('click', function() {
-            adminModal.style.display = 'none';
-        });
-        
-        // 添加后台密码弹窗关闭按钮事件
-        document.getElementById('adminPasswordCloseBtn').addEventListener('click', function() {
-            adminPasswordModal.style.display = 'none';
-        });
-        
-        // 添加点击模态框背景关闭功能
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    this.style.display = 'none';
-                }
-            });
-        });
-        
-        // 初始化应用
-        init();
     </script>
 
 </body></html>
