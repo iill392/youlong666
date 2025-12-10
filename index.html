@@ -459,10 +459,11 @@
     <!-- 跳转弹窗 -->
     <div id="redirectModal" class="modal">
         <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-4">欢迎回来！</h2>
-            <p class="text-lg mb-6">您想要立即跳转到我们的主页面吗？</p>
-            <button id="agreeRedirect" class="modal-button">立即跳转</button>
-            <button id="cancelRedirect" class="modal-button" style="background: rgba(255,255,255,0.1); color: #ffffff; margin-left: 1rem;">稍后再说</button>
+            <h2 class="text-2xl font-bold mb-4">公告</h2>
+            <p class="text-lg mb-6">1.俱乐部今天全场优惠
+              2.本俱乐部新推出算命单【专业老师傅算命】</p>
+            <button id="agreeRedirect" class="modal-button">好的</button>
+
         </div>
     </div>
     
@@ -498,12 +499,8 @@
                 
                 document.getElementById('agreeRedirect').addEventListener('click', function() {
                     redirectModal.style.display = 'none';
-                    // 跳转到指定网页
-                    window.location.href = 'https://iill392.github.io/youlong666/';
-                });
-                
-                document.getElementById('cancelRedirect').addEventListener('click', function() {
-                    redirectModal.style.display = 'none';
+                    // 在新标签页中打开指定网站
+                    window.open('https://iill392.github.io/youlong666/', '_blank');
                 });
             }
             
