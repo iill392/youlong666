@@ -87,22 +87,40 @@
             animation: ripple-animation 2s ease-out;
             pointer-events: none;
             z-index: 9999;
-            background: radial-gradient(circle, rgba(255,105,180,0.6) 0%, rgba(255,0,128,0.5) 30%, rgba(0,242,254,0.3) 60%, rgba(255,215,0,0.2) 100%);
-            box-shadow: 0 0 100px rgba(255,105,180,0.8), 0 0 200px rgba(255,0,128,0.6), 0 0 300px rgba(0,242,254,0.4);
+            background: radial-gradient(circle, rgba(255,105,180,0.8) 0%, rgba(255,0,128,0.7) 30%, rgba(255,182,193,0.5) 50%, rgba(0,242,254,0.3) 70%, rgba(255,215,0,0.2) 100%);
+            box-shadow: 0 0 100px rgba(255,105,180,0.9), 0 0 200px rgba(255,0,128,0.8), 0 0 300px rgba(255,182,193,0.6);
             transform-origin: center;
             will-change: transform, opacity;
+            /* 修复移动设备兼容性 */
+            -webkit-transform: scale(0);
+            -webkit-animation: ripple-animation 2s ease-out;
         }
         
         @keyframes ripple-animation {
             0% {
                 transform: scale(0);
-                opacity: 0.8;
+                opacity: 0.9;
             }
             50% {
-                opacity: 0.5;
+                opacity: 0.6;
             }
             100% {
-                transform: scale(100);
+                transform: scale(150);
+                opacity: 0;
+            }
+        }
+        
+        /* Webkit内核浏览器兼容 */
+        @-webkit-keyframes ripple-animation {
+            0% {
+                -webkit-transform: scale(0);
+                opacity: 0.9;
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                -webkit-transform: scale(150);
                 opacity: 0;
             }
         }
@@ -427,104 +445,10 @@
         // 开始动画
         animate();
         
-        // 点击屏幕产生涟漪效果
-        document.addEventListener('click', function(e) {
-            // 创建涟漪元素
+        // 创建统一的涟漪效果函数
+        function createRipple(x, y) {
             const ripple = document.createElement('div');
             ripple.classList.add('ripple');
-            
-            // 设置涟漪位置
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            ripple.style.left = `${x}px`;
-            ripple.style.top = `${y}px`;
-            
-            // 使用固定的混合颜色，主要是粉色、蓝色和黄色的渐变
-            // 注意：这里不再需要设置backgroundColor，因为已经在CSS中定义了radial-gradient
-            
-            // 为移动设备优化的涟漪效果
-            const size = 20; // 初始小尺寸
-            ripple.style.width = `${size}px`;
-            ripple.style.height = `${size}px`;
-            ripple.style.marginLeft = `-${size / 2}px`;
-            ripple.style.marginTop = `-${size / 2}px`;
-            // 确保在最上层
-            ripple.style.zIndex = '9999';
-            
-            // 添加到文档中
-            document.body.appendChild(ripple);
-            
-            // 动画结束后移除涟漪
-            setTimeout(() => {
-                ripple.remove();
-            }, 2500);
-        });
-        
-        // 处理多点触控
-        document.addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            
-            // 为每个触摸点创建涟漪
-            for (let i = 0; i < e.touches.length; i++) {
-                const touch = e.touches[i];
-                const ripple = document.createElement('div');
-                ripple.classList.add('ripple');
-                
-                const rect = canvas.getBoundingClientRect();
-                const x = touch.clientX - rect.left;
-                const y = touch.clientY - rect.top;
-                
-                ripple.style.left = `${x}px`;
-                ripple.style.top = `${y}px`;
-                
-                // 使用固定的混合颜色，主要是粉色、蓝色和黄色的渐变
-                // 注意：这里不再需要设置backgroundColor，因为已经在CSS中定义了radial-gradient
-                
-                // 为移动设备优化的涟漪效果
-                const size = 20; // 初始小尺寸
-                ripple.style.width = `${size}px`;
-                ripple.style.height = `${size}px`;
-                ripple.style.marginLeft = `-${size / 2}px`;
-                ripple.style.marginTop = `-${size / 2}px`;
-                // 确保在最上层
-                ripple.style.zIndex = '9999';
-                
-                document.body.appendChild(ripple);
-                
-                setTimeout(() => {
-                    ripple.remove();
-                }, 2500);
-            }
-        }, { passive: false });
-        
-        // 确认按钮点击事件
-        document.getElementById('confirmBtn').addEventListener('click', function(e) {
-            // 触发按钮位置的涟漪效果
-            createRipple(e);
-            
-            // 显示加载动画
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            loadingOverlay.classList.add('active');
-            
-            // 延迟跳转，让用户看到加载动画
-            setTimeout(() => {
-                // 尝试多种跳转方式
-                redirectToWebsite();
-            }, 2000); // 2秒延迟，足够用户看到加载动画
-        });
-        
-        // 创建涟漪效果的函数
-        function createRipple(e) {
-            // 创建涟漪元素
-            const ripple = document.createElement('div');
-            ripple.classList.add('ripple');
-            
-            // 设置涟漪位置
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = rect.left + rect.width / 2;
-            const y = rect.top + rect.height / 2;
             
             ripple.style.left = `${x}px`;
             ripple.style.top = `${y}px`;
@@ -538,7 +462,6 @@
             // 确保在最上层
             ripple.style.zIndex = '9999';
             
-            // 添加到文档中
             document.body.appendChild(ripple);
             
             // 动画结束后移除涟漪
@@ -547,52 +470,182 @@
             }, 2500);
         }
         
-        // 多种跳转方式函数
+        // 检测是否为移动设备
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // 根据设备类型绑定不同的事件处理
+        if (isMobile) {
+            // 移动设备：只使用touch事件，避免click事件的延迟和双击问题
+            document.addEventListener('touchstart', function(e) {
+                // 防止点击按钮时触发两次涟漪
+                if (e.target.closest('#confirmBtn')) {
+                    return;
+                }
+                
+                // 为每个触摸点创建涟漪
+                for (let i = 0; i < e.touches.length; i++) {
+                    const touch = e.touches[i];
+                    const x = touch.clientX || touch.pageX;
+                    const y = touch.clientY || touch.pageY;
+                    
+                    createRipple(x, y);
+                }
+            }, { passive: true });
+            
+            // 阻止页面上的默认click事件，避免双击效果
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#confirmBtn')) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        } else {
+            // 桌面设备：只使用click事件
+            document.addEventListener('click', function(e) {
+                // 防止点击按钮时触发两次涟漪
+                if (e.target.closest('#confirmBtn')) {
+                    return;
+                }
+                
+                const x = e.clientX || e.pageX;
+                const y = e.clientY || e.pageY;
+                
+                createRipple(x, y);
+            });
+        }
+        
+        // 确认按钮点击事件 - 优化的设备适配方案
+        const confirmBtn = document.getElementById('confirmBtn');
+        
+        // 按钮点击处理函数
+        function handleButtonClick(e) {
+            // 防止事件冒泡
+            e.stopPropagation();
+            
+            // 触发按钮位置的涟漪效果
+            const rect = confirmBtn.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            createRipple(x, y);
+            
+            // 显示加载动画
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+            
+            // 禁用按钮，防止重复点击
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = '0.7';
+            
+            // 延迟跳转，让用户看到加载动画
+            setTimeout(() => {
+                // 尝试多种跳转方式
+                redirectToWebsite();
+            }, 2000); // 2秒延迟，足够用户看到加载动画
+        }
+        
+        // 根据设备类型绑定按钮事件
+        if (isMobile) {
+            // 移动设备：只绑定touchstart事件
+            confirmBtn.addEventListener('touchstart', function(e) {
+                e.preventDefault(); // 防止触发默认的click事件
+                handleButtonClick(e);
+            }, { passive: false });
+        } else {
+            // 桌面设备：只绑定click事件
+            confirmBtn.addEventListener('click', handleButtonClick);
+        }
+        
+        // 修复的跳转函数 - 解决移动设备跳转问题
         function redirectToWebsite() {
             // 目标网址
             const targetUrl = 'https://iill392.github.io/pmdj/';
             
-            // 方法1: 直接跳转
-            try {
-                window.location.href = targetUrl;
-                // 给跳转一些时间，如果成功就不会执行后面的代码
+            console.log('开始跳转...');
+            
+            // 修复方案：先显示一个带有明确跳转链接的页面
+            const redirectPage = document.createElement('div');
+            redirectPage.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(5, 10, 24, 0.95);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 3000;
+                color: white;
+                text-align: center;
+                padding: 20px;
+                box-sizing: border-box;
+            `;
+            
+            redirectPage.innerHTML = `
+                <h2 style="font-size: 24px; margin-bottom: 20px; color: #ff69b4; text-shadow: 0 0 10px #ff69b4;">正在跳转...</h2>
+                <p style="font-size: 16px; margin-bottom: 30px;">如果没有自动跳转，请点击下方按钮</p>
+                <a href="${targetUrl}" style="
+                    display: inline-block;
+                    padding: 12px 30px;
+                    background: linear-gradient(90deg, #ff69b4, #ff0080);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 30px;
+                    font-weight: bold;
+                    font-size: 16px;
+                    box-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
+                    transition: all 0.3s ease;
+                ">请稍等</a>
+                <p style="margin-top: 20px; font-size: 14px; opacity: 0.7;">游龙平民电竞，做全网最便宜的护航</p>
+            `;
+            
+            document.body.appendChild(redirectPage);
+            
+            // 尝试自动跳转，但同时提供手动跳转选项
+            setTimeout(() => {
+                console.log('尝试方法1: 直接跳转');
+                try {
+                    window.location.href = targetUrl;
+                } catch (e) {
+                    console.error('方法1失败:', e);
+                }
+                
+                // 2秒后尝试replace方法
                 setTimeout(() => {
-                    // 方法2: 使用replace方法
+                    console.log('尝试方法2: replace跳转');
                     try {
                         window.location.replace(targetUrl);
-                        setTimeout(() => {
-                            // 方法3: 打开新窗口
-                            try {
-                                window.open(targetUrl, '_self');
-                                setTimeout(() => {
-                                    // 方法4: 创建链接并模拟点击
-                                    try {
-                                        const link = document.createElement('a');
-                                        link.href = targetUrl;
-                                        link.target = '_self';
-                                        document.body.appendChild(link);
-                                        link.click();
-                                        document.body.removeChild(link);
-                                        
-                                        // 如果所有方法都失败，显示提示
-                                        setTimeout(() => {
-                                            alert('无法自动跳转，请手动复制以下链接访问:\n' + targetUrl);
-                                        }, 1000);
-                                    } catch (e) {
-                                        console.error('方法4失败:', e);
-                                    }
-                                }, 500);
-                            } catch (e) {
-                                console.error('方法3失败:', e);
-                            }
-                        }, 500);
                     } catch (e) {
                         console.error('方法2失败:', e);
                     }
-                }, 500);
-            } catch (e) {
-                console.error('方法1失败:', e);
-            }
+                    
+                    // 再2秒后尝试open方法
+                    setTimeout(() => {
+                        console.log('尝试方法3: open跳转');
+                        try {
+                            window.open(targetUrl, '_self');
+                        } catch (e) {
+                            console.error('方法3失败:', e);
+                        }
+                        
+                        // 再2秒后尝试创建链接并模拟点击
+                        setTimeout(() => {
+                            console.log('尝试方法4: 创建链接并点击');
+                            try {
+                                const link = document.createElement('a');
+                                link.href = targetUrl;
+                                link.target = '_self';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                            } catch (e) {
+                                console.error('方法4失败:', e);
+                                console.log('所有自动跳转方法都失败，显示手动跳转页面');
+                            }
+                        }, 2000);
+                    }, 2000);
+                }, 2000);
+            }, 1000);
         }
     </script>
 
