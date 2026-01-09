@@ -1,23 +1,32 @@
 <html lang="zh-CN"><head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>游龙平民电竞</title>
-    <!-- Tailwind CSS v3 -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#3b82f6',
-                        secondary: '#64748b',
-                        background: '#f3f4f6',
-                        popup: '#ffffff'
+                        primary: '#00f2fe',
+                        secondary: '#7928ca',
+                        accent: '#ff0080',
+                        dark: '#050a18',
+                        light: '#f0f8ff'
                     },
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif']
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px theme(colors.primary), 0 0 10px theme(colors.primary)' },
+                            '100%': { boxShadow: '0 0 10px theme(colors.primary), 0 0 20px theme(colors.primary), 0 0 30px theme(colors.primary)' },
+                        }
                     }
                 }
             }
@@ -25,111 +34,554 @@
     </script>
     <style type="text/tailwindcss">
         @layer utilities {
-            .popup-shadow {
-                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            .text-shadow {
+                text-shadow: 0 0 10px theme(colors.primary), 0 0 20px theme(colors.primary);
             }
-            .btn-hover {
-                @apply transition-colors duration-200 hover:bg-blue-600 active:bg-blue-700;
+            .glass {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .btn-glow {
+                box-shadow: 0 0 10px theme(colors.primary), 0 0 20px theme(colors.primary);
+                transition: all 0.3s ease;
+            }
+            .btn-glow:hover {
+                box-shadow: 0 0 15px theme(colors.primary), 0 0 30px theme(colors.primary), 0 0 45px theme(colors.primary);
+                transform: translateY(-2px);
+            }
+            .popup-animation {
+                animation: popup 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            @keyframes popup {
+                0% { transform: scale(0.8); opacity: 0; }
+                100% { transform: scale(1); opacity: 1; }
             }
         }
     </style>
     <style>
-        body {
+        body, html {
             margin: 0;
             padding: 0;
-            font-family: 'Inter', system-ui, sans-serif;
-            background-color: #f3f4f6;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
-        .overlay {
+        
+        #canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple-animation 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            pointer-events: none;
+            z-index: 999;
+            background: radial-gradient(circle, rgba(255,0,128,0.3) 0%, rgba(0,242,254,0.2) 50%, rgba(255,215,0,0.1) 100%);
+            box-shadow: 0 0 50px rgba(255,0,128,0.5), 0 0 100px rgba(0,242,254,0.3);
+        }
+        
+        @keyframes ripple-animation {
+            0% {
+                transform: scale(0);
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: scale(15);
+                opacity: 0;
+            }
+        }
+        
+        .popup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
         }
+        
         .popup {
-            background-color: white;
-            border-radius: 0.5rem;
             width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 1.5rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            z-index: 1001;
         }
-        .qr-code {
+        
+        .popup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(121, 40, 202, 0.2), rgba(255, 0, 128, 0.2));
+            z-index: -1;
+            border-radius: 20px;
+        }
+        
+        .popup-header {
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .popup-content {
+            padding: 20px;
+        }
+        
+        .popup-footer {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .popup-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-confirm {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: linear-gradient(90deg, #00f2fe, #7928ca, #ff0080);
+            background-size: 200% auto;
+            color: white;
+            animation: gradient 3s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-confirm:active {
+            transform: translateY(0);
+        }
+        
+        /* 加载动画样式 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 10, 24, 0.8);
             display: flex;
             justify-content: center;
-            margin: 1.5rem 0;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
-        .qr-code img {
-            width: 200px;
-            height: 200px;
+        
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
-        .confirm-btn {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 0.375rem;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.2s;
+        
+        .loading-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00f2fe;
+            text-shadow: 0 0 10px #00f2fe, 0 0 20px #00f2fe;
+            animation: pulse 1.5s ease-in-out infinite alternate;
         }
-        .confirm-btn:hover {
-            background-color: #2563eb;
+        
+        .loading-dots span {
+            animation: loading-dots 1.4s infinite ease-in-out both;
+            opacity: 0;
         }
-        .confirm-btn:active {
-            background-color: #1d4ed8;
+        
+        .loading-dots span:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .loading-dots span:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        @keyframes loading-dots {
+            0%, 80%, 100% { opacity: 0; }
+            40% { opacity: 1; }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .popup {
+                width: 95%;
+            }
+            
+            .popup-header, .popup-content, .popup-footer {
+                padding: 15px;
+            }
+            
+            .btn-confirm {
+                padding: 10px 25px;
+                font-size: 14px;
+            }
+        }
+        
+        /* 针对1080x1920分辨率的优化 */
+        @media (width: 1080px) and (height: 1920px) {
+            .popup {
+                width: 85%;
+                max-width: 450px;
+            }
+            
+            .popup-header, .popup-content, .popup-footer {
+                padding: 25px;
+            }
+            
+            .btn-confirm {
+                padding: 15px 40px;
+                font-size: 18px;
+            }
         }
     </style>
 </head>
-<body>
-    <div class="overlay">
-        <div class="popup">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">初8营业</h2>
-            <div class="announcement-content text-gray-600 mb-6">
-                <p class="mb-3" style="font-size: 18px;">尊敬的老板：</p>
-                <p class="mb-3" style="font-size: 16px; font-weight: bold; font-style: italic; color: rgb(240, 17, 5);">初8营业</p>
-                <p class="mb-3" style="font-weight: bold; color: rgb(2, 88, 217);">下单后请立即微信付款，如下单后1小时内未付款，将不会给您派单</p>
-                <p style="font-size: 20px; font-weight: normal; font-style: normal; text-align: center;">添加游龙微信，以便【付款】和【7天无理由退款】微信号【长按复制】:youlong6665</p>
+<body class="bg-dark text-light">
+    <!-- Canvas背景 -->
+    <canvas id="canvas"></canvas>
+    
+    <!-- 弹窗容器 -->
+    <div class="popup-container">
+        <div class="popup glass popup-animation">
+            <div class="popup-header">
+                <h2 class="text-2xl md:text-3xl font-bold text-primary text-shadow">游龙平民电竞【欢迎】</h2>
             </div>
-            <div class="qr-code">
-                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/2d2950e24eb849f39618d829b08dc11b~tplv-a9rns2rl98-image.image?rcl=202512131218147AE3BB1D8B08D0A9D853&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1766204294&amp;x-signature=tuQPj5yMXCnFyMRrTIJU6PL9%2FZg%3D" alt="网站二维码">
-                <div class="mt-2 text-center">
-                    <p class="text-gray-700 font-medium">
-</p>
-                    <p class="text-gray-600" style="text-align: center; font-size: 20px; font-weight: bold; font-style: italic; text-decoration: none;">长按扫码加微信</p>
-                </div>
+            <div class="popup-content">
+                <p class="mb-4">尊敬的老板：</p>
+                <p class="mb-4">俱乐部每天发放一把弗拉迪尾刺【每天12：00】</p>
+                <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/f53d4ea98cd0492eb8e58cc4ec0c3446~tplv-a9rns2rl98-image.image?rcl=2026010919472309AB542164423EAC76E6&amp;rk3s=8e244e95&amp;rrcfp=e75484ac&amp;x-expires=1768564043&amp;x-signature=nZf4OxQAIriO3j3lWIigkt9wPFQ%3D" alt="未来科技" class="popup-image">
             </div>
-            <a href="https://www.kuaishou.com" target="_blank" rel="noopener noreferrer" class="confirm-btn" style="display: block; text-align: center; text-decoration: none;">好的</a>
+            <div class="popup-footer">
+                <button id="confirmBtn" class="btn-confirm btn-glow">
+                    好的 <i class="fa fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 加载动画容器 -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="text-center">
+            <div class="loading-text mb-4">稍等，马上就好</div>
+            <div class="loading-dots text-3xl">
+                <span>●</span>
+                <span>●</span>
+                <span>●</span>
+            </div>
         </div>
     </div>
 
     <script>
-        // 页面加载完成后自动显示弹窗（在这个实现中，弹窗是默认显示的）
-        document.addEventListener('DOMContentLoaded', function() {
-            // 弹窗已经在HTML中静态定义，无需JS动态显示
-            console.log('弹窗已显示');
+        // 获取Canvas元素和上下文
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 设置Canvas尺寸
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        // 初始化时调整Canvas尺寸
+        resizeCanvas();
+        
+        // 窗口大小改变时重新调整Canvas尺寸
+        window.addEventListener('resize', resizeCanvas);
+        
+        // 粒子类
+        class Particle {
+            constructor() {
+                this.reset();
+            }
             
-            // 为按钮添加点击事件监听
-            const confirmBtn = document.querySelector('.confirm-btn');
-            confirmBtn.addEventListener('click', function(e) {
-                // 尝试多种跳转方式
-                window.open('https://mayor-amber-located-michigan.trycloudflare.com/', '_self');
-                // 如果第一种方式失败，尝试第二种
-                setTimeout(function() {
-                    window.location.href = 'https://mayor-amber-located-michigan.trycloudflare.com/';
-                }, 100);
-            });
+            reset() {
+                // 随机位置
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                
+                // 随机速度
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                
+                // 随机大小
+                this.size = Math.random() * 2 + 0.5;
+                
+                // 随机颜色
+                const colors = [
+                    'rgba(0, 242, 254, ',   // 青色
+                    'rgba(121, 40, 202, ',  // 紫色
+                    'rgba(255, 0, 128, '    // 粉色
+                ];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // 随机透明度
+                this.alpha = Math.random() * 0.5 + 0.1;
+            }
+            
+            update() {
+                // 更新位置
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // 边界检查
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            
+            draw() {
+                // 绘制粒子
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color + this.alpha + ')';
+                ctx.fill();
+            }
+        }
+        
+        // 创建粒子数组
+        const particles = [];
+        const particleCount = 100;
+        
+        // 初始化粒子
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+        
+        // 连接粒子的最大距离
+        const maxDistance = 100;
+        
+        // 动画循环
+        function animate() {
+            // 清除画布
+            ctx.fillStyle = 'rgba(5, 10, 24, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 更新和绘制粒子
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                
+                // 连接临近粒子
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < maxDistance) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 242, 254, ${0.2 * (1 - distance / maxDistance)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // 请求下一帧动画
+            requestAnimationFrame(animate);
+        }
+        
+        // 开始动画
+        animate();
+        
+        // 点击屏幕产生涟漪效果
+        document.addEventListener('click', function(e) {
+            // 创建涟漪元素
+            const ripple = document.createElement('div');
+            ripple.classList.add('ripple');
+            
+            // 设置涟漪位置
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            
+            // 使用固定的混合颜色，主要是粉色、蓝色和黄色的渐变
+            // 注意：这里不再需要设置backgroundColor，因为已经在CSS中定义了radial-gradient
+            
+            // 计算涟漪初始大小和最终大小
+            const size = Math.max(canvas.width, canvas.height) * 0.5;
+            ripple.style.width = `${size}px`;
+            ripple.style.height = `${size}px`;
+            ripple.style.marginLeft = `-${size / 2}px`;
+            ripple.style.marginTop = `-${size / 2}px`;
+            
+            // 添加到文档中
+            document.body.appendChild(ripple);
+            
+            // 动画结束后移除涟漪
+            setTimeout(() => {
+                ripple.remove();
+            }, 2500);
         });
+        
+        // 处理多点触控
+        document.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            
+            // 为每个触摸点创建涟漪
+            for (let i = 0; i < e.touches.length; i++) {
+                const touch = e.touches[i];
+                const ripple = document.createElement('div');
+                ripple.classList.add('ripple');
+                
+                const rect = canvas.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                
+                // 使用固定的混合颜色，主要是粉色、蓝色和黄色的渐变
+                // 注意：这里不再需要设置backgroundColor，因为已经在CSS中定义了radial-gradient
+                
+                ripple.style.width = '10px';
+                ripple.style.height = '10px';
+                
+                document.body.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 2500);
+            }
+        }, { passive: false });
+        
+        // 确认按钮点击事件
+        document.getElementById('confirmBtn').addEventListener('click', function(e) {
+            // 触发按钮位置的涟漪效果
+            createRipple(e);
+            
+            // 显示加载动画
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
+            
+            // 延迟跳转，让用户看到加载动画
+            setTimeout(() => {
+                // 尝试多种跳转方式
+                redirectToWebsite();
+            }, 2000); // 2秒延迟，足够用户看到加载动画
+        });
+        
+        // 创建涟漪效果的函数
+        function createRipple(e) {
+            // 创建涟漪元素
+            const ripple = document.createElement('div');
+            ripple.classList.add('ripple');
+            
+            // 设置涟漪位置
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+            
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            
+            // 计算涟漪初始大小和最终大小
+            const size = Math.max(canvas.width, canvas.height) * 0.5;
+            ripple.style.width = `${size}px`;
+            ripple.style.height = `${size}px`;
+            ripple.style.marginLeft = `-${size / 2}px`;
+            ripple.style.marginTop = `-${size / 2}px`;
+            
+            // 添加到文档中
+            document.body.appendChild(ripple);
+            
+            // 动画结束后移除涟漪
+            setTimeout(() => {
+                ripple.remove();
+            }, 2500);
+        }
+        
+        // 多种跳转方式函数
+        function redirectToWebsite() {
+            // 目标网址
+            const targetUrl = 'https://www.example.com';
+            
+            // 方法1: 直接跳转
+            try {
+                window.location.href = targetUrl;
+                // 给跳转一些时间，如果成功就不会执行后面的代码
+                setTimeout(() => {
+                    // 方法2: 使用replace方法
+                    try {
+                        window.location.replace(targetUrl);
+                        setTimeout(() => {
+                            // 方法3: 打开新窗口
+                            try {
+                                window.open(targetUrl, '_self');
+                                setTimeout(() => {
+                                    // 方法4: 创建链接并模拟点击
+                                    try {
+                                        const link = document.createElement('a');
+                                        link.href = targetUrl;
+                                        link.target = '_self';
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                        
+                                        // 如果所有方法都失败，显示提示
+                                        setTimeout(() => {
+                                            alert('无法自动跳转，请手动复制以下链接访问:\n' + targetUrl);
+                                        }, 1000);
+                                    } catch (e) {
+                                        console.error('方法4失败:', e);
+                                    }
+                                }, 500);
+                            } catch (e) {
+                                console.error('方法3失败:', e);
+                            }
+                        }, 500);
+                    } catch (e) {
+                        console.error('方法2失败:', e);
+                    }
+                }, 500);
+            } catch (e) {
+                console.error('方法1失败:', e);
+            }
+        }
     </script>
 
 </body></html>
