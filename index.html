@@ -9,11 +9,11 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#00f2fe',
-                        secondary: '#7928ca',
-                        accent: '#ff0080',
-                        dark: '#050a18',
-                        light: '#f0f8ff'
+                        primary: '#FF6B9D',
+                        secondary: '#FF8E53',
+                        accent: '#FF4757',
+                        dark: '#1A1A2E',
+                        light: '#FFF5F5'
                     },
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -87,8 +87,8 @@
             animation: ripple-animation 2s ease-out;
             pointer-events: none;
             z-index: 9999;
-            background: radial-gradient(circle, rgba(255,105,180,0.4) 0%, rgba(255,0,128,0.35) 30%, rgba(255,182,193,0.25) 50%, rgba(0,242,254,0.15) 70%, rgba(255,215,0,0.1) 100%);
-            box-shadow: 0 0 100px rgba(255,105,180,0.45), 0 0 200px rgba(255,0,128,0.4), 0 0 300px rgba(255,182,193,0.3);
+            background: radial-gradient(circle, rgba(255,107,157,0.4) 0%, rgba(255,142,83,0.35) 30%, rgba(255,71,87,0.3) 50%, rgba(255,193,7,0.2) 70%, rgba(255,152,0,0.1) 100%);
+            box-shadow: 0 0 100px rgba(255,107,157,0.45), 0 0 200px rgba(255,142,83,0.4), 0 0 300px rgba(255,71,87,0.3);
             transform-origin: center;
             will-change: transform, opacity;
             /* 修复移动设备兼容性 */
@@ -142,10 +142,16 @@
         .popup {
             width: 90%;
             max-width: 400px;
-            border-radius: 20px;
+            border-radius: 32px;
             overflow: hidden;
             position: relative;
             z-index: 1001;
+            /* 圆润边框样式 */
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         
         .popup::before {
@@ -157,7 +163,7 @@
             bottom: 0;
             background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(121, 40, 202, 0.2), rgba(255, 0, 128, 0.2));
             z-index: -1;
-            border-radius: 20px;
+            border-radius: 32px;
         }
         
         .popup-header {
@@ -193,7 +199,7 @@
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
-            background: linear-gradient(90deg, #00f2fe, #7928ca, #ff0080);
+            background: linear-gradient(90deg, #FF6B9D, #FF8E53, #FF4757);
             background-size: 200% auto;
             color: white;
             animation: gradient 3s ease infinite;
@@ -304,11 +310,11 @@
     <div class="popup-container">
         <div class="popup glass popup-animation">
             <div class="popup-header">
-                <h2 class="text-2xl md:text-3xl font-bold text-primary text-shadow">游龙平民电竞【欢迎】</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-primary text-shadow">游龙官方</h2>
             </div>
             <div class="popup-content">
-                <p class="mb-4">尊敬的老板：</p>
-                <p class="mb-4">0.1元粉丝福利抽奖【传世武器】无空发</p>
+                <p class="mb-4" style="font-weight: bold;">传世武器为粉丝福利【保证纯免费】</p>
+                <p class="mb-4">网页全新升级，加入了液态玻璃的效果</p>
                 <img src="https://p9-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/code_assistant/241e62b492f2423eb2b897a7651366fb~tplv-a9rns2rl98-image.image?lk3s=8e244e95&amp;rcl=20260131203755E7676D55DA1B74371FE2&amp;rrcfp=e75484ac&amp;x-expires=1770467875&amp;x-signature=Rrao%2F4%2BHIFmG5QHhfRQSvi245EQ%3D" alt="未来科技" class="popup-image">
             </div>
             <div class="popup-footer">
@@ -557,7 +563,7 @@
         // 修复的跳转函数 - 解决移动设备跳转问题
         function redirectToWebsite() {
             // 目标网址
-            const targetUrl = 'https://iill392.github.io/pmdj/';
+            const targetUrl = 'https://iill392.github.io/ylgw/';
             
             console.log('开始尝试跳转...');
             
@@ -596,7 +602,7 @@
                     box-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
                     transition: all 0.3s ease;
                 ">点击跳转</a>
-                <p style="margin-top: 20px; font-size: 14px; opacity: 0.7;">游龙平民电竞做最便宜的护航</p>
+                <p style="margin-top: 20px; font-size: 14px; opacity: 0.7;">游龙官网</p>
             `;
             
             document.body.appendChild(redirectPage);
